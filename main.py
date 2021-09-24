@@ -17,9 +17,8 @@ LEARNING_LANGS = {
     2: "russian",
     3: "french",
 }
-AVAILABLE_LEVELS = {
-    1: "level1",
-}
+AVAILABLE_LEVELS = {0: "all levels", 1: "level 1", 2: "level 2"}
+
 
 class SessionController:
 
@@ -27,14 +26,18 @@ class SessionController:
     Session object which contains session parameters
     for correct question formatting and question selection
     """
-    def __init__(self):
-        self.first_language = "english"
-        self.second_language = "french"
-        self.level = "level1"
-        self.data_path = f"data/{self.level}.csv"
+
+    def __init__(self, first_language="english", second_language="french", level=0):
+        self.first_language = first_language
+        self.second_language = second_language
+        self.level = level
         self.pairs = pd.read_csv(
-            self.data_path, usecols=[self.first_language, self.second_language]
-        )[[self.first_language, self.second_language]].values
+            f"data/phrases.csv",
+            usecols=["level", self.first_language, self.second_language],
+        )
+        self.pairs = self.pairs[
+            self.pairs.level.apply(lambda l: l == level if level > 0 else True)
+        ][[self.first_language, self.second_language]].values
 
         # highly dynamic variables
         self.asked_first_language_phrase = None
@@ -42,7 +45,10 @@ class SessionController:
 
     @property
     def is_new_session(self):
-        if not self.asked_first_language_phrase and not self.asked_first_language_phrase:
+        if (
+            not self.asked_first_language_phrase
+            and not self.asked_first_language_phrase
+        ):
             return True
         return False
 
@@ -121,7 +127,7 @@ def main():
     )
     first_lang = LEARNING_LANGS[int(input("First language id : "))]
     second_lang = LEARNING_LANGS[int(input("Second language id: "))]
-    level = AVAILABLE_LEVELS[int(input("Level id: "))]
+    level = int(input("Level id: "))
     print(
         f"Cool! You have choosed: {Fore.GREEN}[{first_lang}-{second_lang}]{Style.RESET_ALL}"
     )
