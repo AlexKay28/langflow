@@ -21,15 +21,40 @@ AVAILABLE_LEVELS = {
     1: "level1",
 }
 
+class SessionController:
 
-def get_languages_pair(known_lang, learn_lang, level):
     """
-    Get pair from internal data
+    Session object which contains session parameters
+    for correct question formatting and question selection
     """
-    pairs = pd.read_csv(f"data/{level}.csv", usecols=[known_lang, learn_lang])[
-        [known_lang, learn_lang]
-    ].values
-    return pairs[np.random.choice(len(pairs))]
+    def __init__(self):
+        self.first_language = "english"
+        self.second_language = "french"
+        self.level = "level1"
+        self.data_path = f"data/{self.level}.csv"
+        self.pairs = pd.read_csv(
+            self.data_path, usecols=[self.first_language, self.second_language]
+        )[[self.first_language, self.second_language]].values
+
+        # highly dynamic variables
+        self.asked_first_language_phrase = None
+        self.asked_second_language_phrase = None
+
+    @property
+    def is_new_session(self):
+        if not self.asked_first_language_phrase and not self.asked_first_language_phrase:
+            return True
+        return False
+
+    def get_session_langs_phrases(self):
+        return self.asked_first_language_phrase, self.asked_second_language_phrase
+
+    def set_session_langs_phrases(self, first_language_phrase, second_language_phrase):
+        self.asked_first_language_phrase = first_language_phrase
+        self.asked_second_language_phrase = second_language_phrase
+
+    def generate_phrase_pair(self):
+        return self.pairs[np.random.choice(len(self.pairs))]
 
 
 def get_session(known_lang, learn_lang, level):
@@ -37,12 +62,13 @@ def get_session(known_lang, learn_lang, level):
     Session itself. User choose session_learning_language parameter
     which defines which dataset to use for known and learning language
     """
+    session = SessionController()
     bad_answers_counter = Counter()
     actions_counter = 0
     user_answer = None
     while 1:
         actions_counter += 1
-        first_lang, second_lang = get_languages_pair(known_lang, learn_lang, level)
+        first_lang, second_lang = session.generate_phrase_pair()
         phrase = f"{Fore.YELLOW}{first_lang}{Style.RESET_ALL}"
         print(f"{{:<20}} >> {{}}".format(f"Phrase #{actions_counter}", phrase))
         print(f"{{:<20}} >> ".format("Translate"), end="")

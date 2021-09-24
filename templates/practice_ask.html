@@ -12,8 +12,8 @@ LangFlowHome
 {% endblock %}
 
 {% block body %}
-  <h2>Translate: {{first_language}}</h2>
+  <h2>Translate: {{first_language_phrase}}</h2>
   <form action="/practice" method="post">
-    <input type="string" name="second_language_answer", id="second_language_answer">
+    <input type="string" name="second_language_phrase_answer">
   </form>
 {% endblock %}
