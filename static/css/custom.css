@@ -17,9 +17,48 @@ a {
 }
 
 .base-container {
-  padding-top: 106px;
+  padding-top: 100px;
 }
 
 .navbar-collapse {
   flex-grow: 0;
+}
+
+.row {
+  justify-content: space-around;
+}
+
+.team4 .font-weight-medium {
+	font-weight: 500;
+}
+
+.team4 h5 {
+    line-height: 22px;
+    font-size: 18px;
+}
+
+.team4 .subtitle {
+    color: #8d97ad;
+    line-height: 24px;
+		font-size: 13px;
+}
+
+.team4 ul li a {
+  color: #8d97ad;
+  padding-right: 15px;
+  -webkit-transition: 0.1s ease-in;
+  -o-transition: 0.1s ease-in;
+  transition: 0.1s ease-in;
+}
+
+.team4 ul li a:hover {
+  -webkit-transform: translate3d(0px, -5px, 0px);
+  transform: translate3d(0px, -5px, 0px);
+	color: #316ce8;
+}
+
+.btn-largest {
+  padding: 1.5rem 6rem;
+  font-size: 2.25rem;
+  border-radius: .3rem;
 }
