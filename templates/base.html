@@ -8,8 +8,8 @@
   <title>{% block title %}{% endblock %}</title>
 </head>
 <body class="h-100 text-center text-white bg-dark">
-  <nav class="container navbar fixed-top navbar-expand justify-content-between navbar-dark bg-dark">
-    <a class="navbar-brand logo" href="#"></a>
+  <nav class="container navbar fixed-top navbar-expand justify-content-between navbar-dark bg-dark px-4">
+    <a class="navbar-brand logo" href="/"></a>
     <div class="navbar-collapse">
       <ul class="navbar-nav mr-auto">
         <li class="nav-item active">
@@ -22,15 +22,9 @@
     </div>
   </nav>
   <div class="container-lg d-flex w-100 h-100 mx-auto flex-column base-container">
-    <main class="px-3">
-      {% block our_team %}{% endblock %}
-      {% block about_project %}{% endblock %}
-      <p class="lead">{% block body %}{% endblock %}</p>
-    </main>
-
-    <footer class="mt-auto text-white-50">
-      <p>Service created by <a href="https://github.com/AlexKay28" class="text-white">AlexKay</a> and <a href="https://github.com/Alkhimovmv" class="text-white">AlkhimovMV</a>.</p>
-    </footer>
+    {% block our_team %}{% endblock %}
+    {% block about_project %}{% endblock %}
+    {% block body %}{% endblock %}
   </div>
 </body>
 </html>

@@ -1,18 +1,13 @@
 {% extends 'base.html' %}
 
-{% block title %}
-LangFlowHome
-{% endblock %}
-
-{% block central_pic %}
-<a href="/">
-   <img alt="logo" src="https://github.com/AlexKay28/langflow/blob/main/media/logo.png?raw=true" width="300" height="300">
-</a>
-{% endblock %}
-
 {% block body %}
+<div class="centered-element">
   <h2>Translate: {{first_language}}</h2>
   <form action="/practice" method="post">
-    <input type="string" name="second_language_answer", id="second_language_answer">
+    <input type="string" name="second_language_answer" id="second_language_answer" class="form-control" placeholder="Enter text" autocomplete="off">
   </form>
+</div>
+<footer class="pb-4 text-white-50 fixed-bottom-element">
+  <p>Service created by <a href="https://github.com/AlexKay28" class="text-white">AlexKay</a> and <a href="https://github.com/Alkhimovmv" class="text-white">AlkhimovMV</a>.</p>
+</footer>
 {% endblock %}
