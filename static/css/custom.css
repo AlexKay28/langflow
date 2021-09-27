@@ -94,6 +94,18 @@ a {
   text-align: start;
 }
 
+.table-text_translate {
+  color: orange;
+}
+
+.table-text_answer {
+  color: white;
+}
+
+.table-text_correct-answer {
+  color: green;
+}
+
 @media screen and (max-width: 768px) {
   .table-header {
     font-size: 24px;
