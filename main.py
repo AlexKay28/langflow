@@ -26,7 +26,6 @@ class SessionController:
     Session object which contains session parameters
     for correct question formatting and question selection
     """
-
     def __init__(self, first_language="english", second_language="french", level=0):
         self.first_language = first_language
         self.second_language = second_language
