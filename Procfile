@@ -1,1 +1,1 @@
-web: sh -c 'cd langflow && gunicorn app:app'
+web: ls
