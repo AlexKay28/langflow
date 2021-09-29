@@ -1,1 +1,1 @@
-web: cd langflow && gunicorn app:app
+web: sh -c 'cd langflow && gunicorn app:app'
