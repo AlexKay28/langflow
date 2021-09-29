@@ -2,9 +2,9 @@
 
 {% block body %}
 <div class="centered-element">
-  <h2>Translate: {{first_language}}</h2>
+  <h2>Translate: {{first_language_phrase}}</h2>
   <form action="/practice" method="post">
-    <input type="string" name="second_language_answer" id="second_language_answer" class="form-control" placeholder="Enter text" autocomplete="off">
+    <input type="string" name="second_language_phrase_answer" class="form-control" placeholder="Enter text" autocomplete="off" autofocus>
   </form>
 </div>
 <footer class="pb-4 text-white-50 fixed-bottom-element">
