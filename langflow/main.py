@@ -42,58 +42,73 @@ class SessionController:
         ][[self.first_language, self.second_language]].values
 
         # highly dynamic variables
-        self.asked_first_language_phrase = None
-        self.asked_second_language_phrase = None
+        self.first_language_phrase = None
+        self.second_language_phrase_answer = None
 
     @property
     def is_new_session(self):
-        if (
-            not self.asked_first_language_phrase
-            and not self.asked_first_language_phrase
-        ):
+        if not self.first_language_phrase and not self.first_language_phrase:
             return True
         return False
 
     def get_session_langs_phrases(self):
-        return self.asked_first_language_phrase, self.asked_second_language_phrase
+        return self.first_language_phrase, self.second_language_phrase_answer
 
-    def set_session_langs_phrases(self, first_language_phrase, second_language_phrase):
-        self.asked_first_language_phrase = first_language_phrase
-        self.asked_second_language_phrase = second_language_phrase
+    def set_session_langs_phrases(
+        self, first_language_phrase, second_language_phrase_answer
+    ):
+        self.first_language_phrase = first_language_phrase
+        self.second_language_phrase_answer = second_language_phrase_answer
 
     def generate_phrase_pair(self):
         return self.pairs[np.random.choice(len(self.pairs))]
 
 
-def get_session(known_lang, learn_lang, level):
+def get_session(first_language, second_language, level):
     """
     Session itself. User choose session_learning_language parameter
     which defines which dataset to use for known and learning language
     """
     session = SessionController(
-        first_language=known_lang, second_language=learn_lang, level=level
+        first_language=first_language, second_language=second_language, level=level
     )
     bad_answers_counter = Counter()
     actions_counter = 0
     user_answer = None
     while 1:
         actions_counter += 1
-        first_lang, second_lang = session.generate_phrase_pair()
-        phrase = f"{Fore.YELLOW}{first_lang}{Style.RESET_ALL}"
-        print(f"{{:<20}} >> {{}}".format(f"Phrase #{actions_counter}", phrase))
-        print(f"{{:<20}} >> ".format("Translate"), end="")
+        (
+            first_language_phrase,
+            second_language_phrase_answer,
+        ) = session.generate_phrase_pair()
+        phrase = f"{Fore.YELLOW}{first_language_phrase}{Style.RESET_ALL}"
+        print(f"{{:<25}}>> {{}}".format(f"Phrase #{actions_counter}", phrase))
+        print(f"{{:<25}}>> ".format("Translate"), end="")
         user_answer = input()
 
-        if compare_answers(second_lang, user_answer):
-            second_lang = f"{Fore.GREEN}{second_lang}{Style.RESET_ALL}"
-            print(f"{{:<20}}\n".format("Right answer!"), end="")
+        comparing_result = compare_answers(
+            second_language, second_language_phrase_answer, user_answer
+        )
+
+        if comparing_result["is_equal"]:
+            second_language_phrase_answer = (
+                f"{Fore.GREEN}{second_language_phrase_answer}{Style.RESET_ALL}"
+            )
+            print(f"{{:<25}}\n".format("Right answer!"), end="")
         else:
-            bad_answers_counter.update([f"{first_lang}->{second_lang}"])
-            differences = show_differences(second_lang, user_answer)
-            print(f"{{:<20}} >> {{}}".format("Bad answer", differences))
-            print(f"{{:<20}} >> ".format("Repeat please"), end="")
-            differences = show_differences(second_lang, input())
-            print(f"{{:<20}} >> {{}}".format("Well!", differences))
+            bad_answers_counter.update(
+                [f"{first_language_phrase}->{second_language_phrase_answer}"]
+            )
+            differences = show_differences(second_language_phrase_answer, user_answer)
+            print(f"{{:<25}}>> {{}} ".format("Bad answer", differences))
+            print(
+                f"{{:<25}}   (Equality rate: {{}})".format(
+                    "", comparing_result["equality_rate"]
+                )
+            )
+            print(f"{{:<25}}>> ".format("Repeat please"), end="")
+            differences = show_differences(second_language_phrase_answer, input())
+            print(f"{{:<25}}>> {{}}".format("Well!", differences))
         print()
 
         if actions_counter == SESSION_PHRASES_COUNTER:
@@ -129,14 +144,15 @@ def main():
     {AVAILABLE_LEVELS}
     """
     )
-    first_lang = LEARNING_LANGS[int(input("First language id : "))]
-    second_lang = LEARNING_LANGS[int(input("Second language id: "))]
-    level = int(input("Level id: "))
+    first_language = LEARNING_LANGS[int(input("First language id : ") or "1")]
+    second_language = LEARNING_LANGS[int(input("Second language id: ") or "3")]
+    level = int(input("Level id: ") or "0")
     print(
-        f"Cool! You have choosed: {Fore.GREEN}[{first_lang}-{second_lang}]{Style.RESET_ALL}"
+        f"Cool! You have choosed: {Fore.GREEN}[{first_language}-{second_language}]{Style.RESET_ALL} "
+        f"\with {Fore.GREEN}level[{level}]{Style.RESET_ALL}"
     )
     try:
-        get_session(first_lang, second_lang, level=level)
+        get_session(first_language, second_language, level=level)
         print("Well, session is DONE then! Good luck!")
     except KeyboardInterrupt:
         print("\nStopping session softly.")
