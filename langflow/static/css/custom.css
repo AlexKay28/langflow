@@ -7,7 +7,7 @@ a {
 }
 
 .logo {
-  background: url("https://github.com/AlexKay28/langflow/blob/main/media/logo.png?raw=true") center center no-repeat;
+  background: url("../media/logo.png") center center no-repeat;
   width: 200px;
   height: 90px;
 }
