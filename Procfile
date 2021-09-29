@@ -1,1 +1,1 @@
-web: docker-compose up --build
+web: cd langflow && gunicorn app:app
