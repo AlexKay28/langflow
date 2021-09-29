@@ -1,22 +1,30 @@
 {% extends 'base.html' %}
 
-{% block title %}
-LangFlowHome
-{% endblock %}
-
-{% block central_pic %}
-<a href="https://www.qries.com/">
-   <img alt="Qries" src="https://github.com/AlexKay28/langflow/blob/main/media/logo.png?raw=true" width="300" height="300">
-</a>
-<h5>main page answer</h5>
-{% endblock %}
-
 {% block body %}
-  <h2>Translate: {{first_language}}</h2>
-  <h2>Answer: {{second_language_answer}}</h2>
-  <h2>Correct answer: {{second_language}}</h2>
+<div class="centered-element w-100">
+  <table class="custom-table text-white-50">
+    <tbody>
+      <tr>
+        <td class="table-header">Translate:</td>
+        <td class="table-text table-text_translate">{{first_language_phrase}}</td>
+      </tr>
+      <tr></tr>
+        <td class="table-header ">Answer:</td>
+        <td class="table-text table-text_answer">{{second_language_phrase_answer}}</td>
+      </tr>
+      <tr>
+        <td class="table-header">Correct answer:</td>
+        <td class="table-text table-text_correct-answer">{{second_language_phrase}}</td>
+      </tr>
+    </tbody>
+  </table>
 
   <form method="get">
-    <input type="submit" class="btn btn-success" value="next">
+    <button class="btn btn-success btn-lg" value="Next"  id="next_button" >Next</button>
   </form>
+</div>
+
+<footer class="pb-4 text-white-50 fixed-bottom-element">
+  <p>Service created by <a href="https://github.com/AlexKay28" class="text-white">AlexKay</a> and <a href="https://github.com/Alkhimovmv" class="text-white">AlkhimovMV</a>.</p>
+</footer>
 {% endblock %}

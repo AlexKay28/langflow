@@ -17,19 +17,49 @@ LEARNING_LANGS = {
     2: "russian",
     3: "french",
 }
-AVAILABLE_LEVELS = {
-    1: "level1",
-}
+AVAILABLE_LEVELS = {0: "all levels", 1: "level 1", 2: "level 2"}
 
 
-def get_languages_pair(known_lang, learn_lang, level):
+class SessionController:
+
     """
-    Get pair from internal data
+    Session object which contains session parameters
+    for correct question formatting and question selection
     """
-    pairs = pd.read_csv(f"data/{level}.csv", usecols=[known_lang, learn_lang])[
-        [known_lang, learn_lang]
-    ].values
-    return pairs[np.random.choice(len(pairs))]
+    def __init__(self, first_language="english", second_language="french", level=0):
+        self.first_language = first_language
+        self.second_language = second_language
+        self.level = level
+        self.pairs = pd.read_csv(
+            f"data/phrases.csv",
+            usecols=["level", self.first_language, self.second_language],
+        )
+        self.pairs = self.pairs[
+            self.pairs.level.apply(lambda l: l == level if level > 0 else True)
+        ][[self.first_language, self.second_language]].values
+
+        # highly dynamic variables
+        self.asked_first_language_phrase = None
+        self.asked_second_language_phrase = None
+
+    @property
+    def is_new_session(self):
+        if (
+            not self.asked_first_language_phrase
+            and not self.asked_first_language_phrase
+        ):
+            return True
+        return False
+
+    def get_session_langs_phrases(self):
+        return self.asked_first_language_phrase, self.asked_second_language_phrase
+
+    def set_session_langs_phrases(self, first_language_phrase, second_language_phrase):
+        self.asked_first_language_phrase = first_language_phrase
+        self.asked_second_language_phrase = second_language_phrase
+
+    def generate_phrase_pair(self):
+        return self.pairs[np.random.choice(len(self.pairs))]
 
 
 def get_session(known_lang, learn_lang, level):
@@ -37,12 +67,13 @@ def get_session(known_lang, learn_lang, level):
     Session itself. User choose session_learning_language parameter
     which defines which dataset to use for known and learning language
     """
+    session = SessionController()
     bad_answers_counter = Counter()
     actions_counter = 0
     user_answer = None
     while 1:
         actions_counter += 1
-        first_lang, second_lang = get_languages_pair(known_lang, learn_lang, level)
+        first_lang, second_lang = session.generate_phrase_pair()
         phrase = f"{Fore.YELLOW}{first_lang}{Style.RESET_ALL}"
         print(f"{{:<20}} >> {{}}".format(f"Phrase #{actions_counter}", phrase))
         print(f"{{:<20}} >> ".format("Translate"), end="")
@@ -95,7 +126,7 @@ def main():
     )
     first_lang = LEARNING_LANGS[int(input("First language id : "))]
     second_lang = LEARNING_LANGS[int(input("Second language id: "))]
-    level = AVAILABLE_LEVELS[int(input("Level id: "))]
+    level = int(input("Level id: "))
     print(
         f"Cool! You have choosed: {Fore.GREEN}[{first_lang}-{second_lang}]{Style.RESET_ALL}"
     )
