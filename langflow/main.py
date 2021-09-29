@@ -16,6 +16,7 @@ LEARNING_LANGS = {
     1: "english",
     2: "russian",
     3: "french",
+    4: "ukrainian",
 }
 AVAILABLE_LEVELS = {0: "all levels", 1: "level 1", 2: "level 2"}
 
@@ -26,6 +27,7 @@ class SessionController:
     Session object which contains session parameters
     for correct question formatting and question selection
     """
+
     def __init__(self, first_language="english", second_language="french", level=0):
         self.first_language = first_language
         self.second_language = second_language
@@ -34,6 +36,7 @@ class SessionController:
             f"data/phrases.csv",
             usecols=["level", self.first_language, self.second_language],
         )
+        print(self.pairs.columns)
         self.pairs = self.pairs[
             self.pairs.level.apply(lambda l: l == level if level > 0 else True)
         ][[self.first_language, self.second_language]].values
@@ -67,7 +70,9 @@ def get_session(known_lang, learn_lang, level):
     Session itself. User choose session_learning_language parameter
     which defines which dataset to use for known and learning language
     """
-    session = SessionController()
+    session = SessionController(
+        first_language=known_lang, second_language=learn_lang, level=level
+    )
     bad_answers_counter = Counter()
     actions_counter = 0
     user_answer = None
