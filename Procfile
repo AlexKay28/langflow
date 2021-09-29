@@ -1,2 +1,1 @@
-web: cd langflow
-web: gunicorn app:app
+web: cd langflow && gunicorn app:app
