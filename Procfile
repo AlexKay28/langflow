@@ -1,1 +1,1 @@
-web: cd langflow && gunicorn app:app
+langflow/Procfile
