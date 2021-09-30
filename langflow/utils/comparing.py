@@ -7,8 +7,7 @@ def normalize_form_of_answer(answer: str) -> str:
     Normalize string to the single form which are
     equal in any case of writing style.
     """
-    answer = answer.lower()
-    answer = answer.strip()
+    answer = answer.lower().strip()
 
     symbols_to_ignore = "!@#$%^&?,.:;"
     for symb in symbols_to_ignore:
@@ -16,7 +15,7 @@ def normalize_form_of_answer(answer: str) -> str:
     return answer
 
 
-def tokenize_answer(answer: str) -> List:
+def tokenize_answer(language_model, answer: str) -> List:
     """
     Tokenize sentence
     """
@@ -24,12 +23,14 @@ def tokenize_answer(answer: str) -> List:
     return tokens
 
 
-def get_equality_rate(language: str, user_answer: str, real_answer: str) -> float:
+def get_equality_rate(
+    language_model, language: str, user_answer: str, real_answer: str
+) -> float:
     """
     Get equality_rate between users
     """
-    user_answer_tokens = tokenize_answer(user_answer)
-    real_answer_tokens = tokenize_answer(real_answer)
+    user_answer_tokens = tokenize_answer(language_model, user_answer)
+    real_answer_tokens = tokenize_answer(language_model, real_answer)
     if language in ["russian", "french", "ukrainian"]:
         equality_rate = sum(
             [u in real_answer_tokens for u in user_answer_tokens],
@@ -49,7 +50,9 @@ def get_equality_rate(language: str, user_answer: str, real_answer: str) -> floa
     return equality_rate
 
 
-def compare_answers(language: str, real_answer: str, user_answer: str) -> bool:
+def compare_answers(
+    language_model, language: str, real_answer: str, user_answer: str
+) -> bool:
     """
     This function compares answer and makes an inference
     about of equality
@@ -57,7 +60,9 @@ def compare_answers(language: str, real_answer: str, user_answer: str) -> bool:
     user_answer = normalize_form_of_answer(user_answer)
     real_answer = normalize_form_of_answer(real_answer)
 
-    equality_rate = get_equality_rate(language, user_answer, real_answer)
+    equality_rate = get_equality_rate(
+        language_model, language, user_answer, real_answer
+    )
     is_equal = equality_rate >= 0.95
 
     comparing_result = {

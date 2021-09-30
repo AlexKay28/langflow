@@ -1,4 +1,4 @@
-from main import SessionController
+from utils.session import SessionController
 from flask import Flask, render_template, url_for, request, redirect
 
 app = Flask(__name__)
@@ -27,8 +27,11 @@ def home():
             "practice_ask.html",
             first_language_phrase=first_language_phrase,
         )
-    elif request.method == "POST" :
-        first_language_phrase, second_language_phrase = session.get_session_langs_phrases()
+    elif request.method == "POST":
+        (
+            first_language_phrase,
+            second_language_phrase,
+        ) = session.get_session_langs_phrases()
         second_language_phrase_answer = request.form["second_language_phrase_answer"]
         return render_template(
             "practice_answer.html",
