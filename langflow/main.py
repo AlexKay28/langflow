@@ -71,7 +71,7 @@ def get_session_terminal(first_language="english", second_language="french", lev
             print(f"{{:<25}}>> {{}} ".format("Bad answer", differences))
             print(
                 f"{{:<25}}   (Equality rate: {{}})".format(
-                    "", comparing_result["equality_rate"]
+                    "", round(comparing_result["equality_rate"], 3)
                 )
             )
             print(f"{{:<25}}>> ".format("Repeat please"), end="")

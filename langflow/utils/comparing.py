@@ -1,5 +1,9 @@
 import os
+import numpy as np
+from scipy.spatial.distance import cosine
 from typing import List
+
+CORRECTNESS_RATE = 0.98
 
 
 def normalize_form_of_answer(answer: str) -> str:
@@ -15,12 +19,34 @@ def normalize_form_of_answer(answer: str) -> str:
     return answer
 
 
-def tokenize_answer(language_model, answer: str) -> List:
+def tokenize_answer(answer: str) -> List:
     """
     Tokenize sentence
     """
     tokens = answer.split() if len(answer) > 0 else []
     return tokens
+
+
+def get_phrase_vector(language_model, phrase_tokens, approach=None):
+    """
+    Get phrase vector using language model which provides each
+    containing token embedding
+    """
+    if not approach:
+        phrase_vec = language_model.get_sentence_vector(" ".join(phrase_tokens))
+    elif approach == "mean":
+        phrase_tokes_vec = [language_model[tok] for tok in phrase_tokens]
+        phrase_vec = np.mean(phrase_tokens, axis=0)
+    return phrase_vec
+
+
+def get_similarity(vec1, vec2, metric="cosine"):
+    """
+    Calculate semantic closeness using choosed metric function
+    """
+    if metric == "cosine":
+        return 1 - cosine(vec1, vec2)
+    raise ValueError(f"Unknown distance metric <{metric}>")
 
 
 def get_equality_rate(
@@ -29,24 +55,14 @@ def get_equality_rate(
     """
     Get equality_rate between users
     """
-    user_answer_tokens = tokenize_answer(language_model, user_answer)
-    real_answer_tokens = tokenize_answer(language_model, real_answer)
-    if language in ["russian", "french", "ukrainian"]:
-        equality_rate = sum(
-            [u in real_answer_tokens for u in user_answer_tokens],
-        )
-        equality_rate = (
-            2 * equality_rate / (len(real_answer_tokens) + len(user_answer_tokens))
-        )
-    elif language in ["english"]:
-        equality_rate = sum(
-            [u == r for u, r in zip(user_answer_tokens, real_answer_tokens)],
-        )
-        equality_rate = (
-            2 * equality_rate / (len(real_answer_tokens) + len(user_answer_tokens))
-        )
-    else:
-        raise ValueError(f"Unknown language <{language}>")
+    if not user_answer:
+        return 0.0
+    user_answer_tokens = tokenize_answer(user_answer)
+    real_answer_tokens = tokenize_answer(real_answer)
+    equality_rate = get_similarity(
+        get_phrase_vector(language_model, user_answer_tokens),
+        get_phrase_vector(language_model, real_answer_tokens),
+    )
     return equality_rate
 
 
@@ -63,7 +79,7 @@ def compare_answers(
     equality_rate = get_equality_rate(
         language_model, language, user_answer, real_answer
     )
-    is_equal = equality_rate >= 0.95
+    is_equal = equality_rate >= CORRECTNESS_RATE
 
     comparing_result = {
         "is_equal": is_equal,

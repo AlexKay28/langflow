@@ -1,7 +1,10 @@
+import os
+import fasttext
 import numpy as np
 import pandas as pd
 
 PATH_TO_DATA = "data/phrases.csv"
+PATH_TO_MODELS = "language_models/"
 
 
 class SessionController:
@@ -13,7 +16,9 @@ class SessionController:
     def __init__(self, first_language, second_language, level):
         self.first_language = first_language
         self.second_language = second_language
-        self.language_model = None
+        self.language_model = fasttext.load_model(
+            os.path.join(PATH_TO_MODELS, f"{second_language}5.bin")
+        )
         self.level = level
         self.pairs = pd.read_csv(
             PATH_TO_DATA,
