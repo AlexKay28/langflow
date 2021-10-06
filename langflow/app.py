@@ -78,8 +78,9 @@ def answer_api():
             "question": first_language_phrase,
             "answer": second_language_phrase,
             "answer_user": second_language_phrase_answer,
-            "is_equal": comparing_result["is_equal"],
-            "score": comparing_result["equality_rate"],
+            "is_equal": is_equal,
+            "score": equality_rate,
+            "differences": differences,
         }
     )
 
