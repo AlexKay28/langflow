@@ -3,5 +3,4 @@ document.onkeydown = function (e) {
     if (e.keyCode === 13 && !e.repeat) {
         document.getElementById("next_button").click()
     }
-    return false
 }
