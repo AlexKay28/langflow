@@ -14,7 +14,7 @@ class Header extends React.Component {
 
     render() {
         return (
-            <Navbar bg="dark" variant="dark">
+            <Navbar fixed="top" bg="dark" variant="dark">
                 <Container className="border-bottom">
                     <Navbar.Brand href="/">
                         <img

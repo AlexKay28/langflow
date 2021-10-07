@@ -15,12 +15,10 @@ class HomePage extends React.Component {
     render() {
         return (
             <>
-                <div className="h-100 text-center text-white bg-dark">
-                    <GoPractice/>
-                    <AboutProject/>
-                    <OurTeam/>
-                    <Footer/>
-                </div>
+                <GoPractice/>
+                <AboutProject/>
+                <OurTeam/>
+                <Footer/>
             </>
         );
     }
