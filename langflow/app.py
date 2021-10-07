@@ -1,6 +1,10 @@
 import json
-from main import generate_phrase_pair
+import uuid
+
+from utils.choosing import generate_phrase_pair
 from utils.session import SessionController
+from utils.comparing import compare_answers
+from utils.tips import show_differences
 
 from flask import Flask, render_template, url_for, request, redirect
 
@@ -9,7 +13,7 @@ session = SessionController(first_language="english", second_language="french", 
 
 
 @app.route("/", methods=["POST", "GET"])
-def index():
+def home_page():
     """
     Main page of LangFlow
     """
@@ -18,45 +22,29 @@ def index():
     return render_template("index.html")
 
 
-@app.route("/practice", methods=["POST", "GET"])
-def home():
+@app.route("/practice", methods=["GET"])
+def practice_page():
     """
     Practicing page
     """
-    if request.method == "GET" or session.is_new_session:
-        first_language_phrase, second_language_phrase = generate_phrase_pair(
-            session.get_pairs()
-        )
-        session.set_session_langs_phrases(first_language_phrase, second_language_phrase)
-        return render_template(
-            "practice_ask.html",
-            first_language_phrase=first_language_phrase,
-        )
-    elif request.method == "POST":
-        (
-            first_language_phrase,
-            second_language_phrase,
-        ) = session.get_session_langs_phrases()
-        second_language_phrase_answer = request.form["second_language_phrase_answer"]
-        return render_template(
-            "practice_answer.html",
-            first_language_phrase=first_language_phrase,
-            second_language_phrase=second_language_phrase,
-            second_language_phrase_answer=second_language_phrase_answer,
-        )
-    else:
-        raise ValueError(f"Method <{request.method}> underfined!")
+    return render_template("practice.html")
 
 
 @app.route("/question", methods=["GET"])
-def question():
+def question_api():
     first_language_phrase, second_language_phrase = generate_phrase_pair(
         session.get_pairs()
     )
-    session.set_session_langs_phrases(first_language_phrase, second_language_phrase)
+    uuid_generated = str(uuid.uuid4())
+
+    session.set_session_langs_phrases(
+        uuid_generated,
+        first_language_phrase,
+        second_language_phrase,
+    )
     return json.dumps(
         {
-            "qid": None,
+            "uuid": uuid_generated,
             "question": first_language_phrase,
             "answer": second_language_phrase,
         }
@@ -64,18 +52,35 @@ def question():
 
 
 @app.route("/answer", methods=["POST"])
-def answer():
-    first_language_phrase, second_language_phrase = session.get_session_langs_phrases()
-    second_language_phrase_answer = request.form["second_language_phrase_answer"]
+def answer_api():
+    uuid = request.args["uuid"]
+    second_language_phrase_answer = request.args["second_language_phrase_answer"]
+    first_language_phrase, second_language_phrase = session.get_session_langs_phrases(
+        uuid
+    )
+    comparing_result = compare_answers(
+        session.language_model,
+        second_language_phrase,
+        second_language_phrase_answer,
+    )
+    is_equal = comparing_result["is_equal"]
+    equality_rate = comparing_result["equality_rate"]
 
-    score = 1  # python code (server side)
+    differences = ""
+    if not is_equal:
+        differences = show_differences(
+            second_language_phrase,
+            second_language_phrase_answer,
+        )
 
     return json.dumps(
         {
             "question": first_language_phrase,
             "answer": second_language_phrase,
             "answer_user": second_language_phrase_answer,
-            "score": score,
+            "is_equal": is_equal,
+            "score": equality_rate,
+            "differences": differences,
         }
     )
 

@@ -4,6 +4,7 @@ import numpy as np
 from colorama import Fore, Style
 from collections import Counter
 
+from utils.choosing import generate_phrase_pair
 from utils.tips import show_differences
 from utils.session import SessionController
 from utils.comparing import compare_answers
@@ -19,11 +20,6 @@ LEARNING_LANGS = {
     4: "ukrainian",
 }
 AVAILABLE_LEVELS = {0: "all levels", 1: "level 1", 2: "level 2"}
-
-
-def generate_phrase_pair(pairs):
-    f, s = pairs[np.random.choice(len(pairs))]
-    return f.lower().capitalize(), s.lower().capitalize()
 
 
 def get_session_terminal(first_language="english", second_language="french", level=0):
@@ -53,7 +49,6 @@ def get_session_terminal(first_language="english", second_language="french", lev
 
         comparing_result = compare_answers(
             session.language_model,
-            second_language,
             second_language_phrase_answer,
             user_answer,
         )
