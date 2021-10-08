@@ -1,8 +1,8 @@
 import React from 'react'
 import axios from 'axios'
-import './answer.scss'
+import './question.scss'
 
-class Answer extends React.Component {
+class Question extends React.Component {
     constructor(props) {
         super(props)
     
@@ -65,4 +65,4 @@ class Answer extends React.Component {
 }
 
 
-export default Answer;
+export default Question;

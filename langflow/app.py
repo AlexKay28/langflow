@@ -8,7 +8,10 @@ from utils.tips import show_differences
 
 from flask import Flask, render_template, url_for, request, redirect
 
+from flask_cors import CORS
+
 app = Flask(__name__)
+CORS(app)
 session = SessionController(first_language="english", second_language="french", level=0)
 
 
