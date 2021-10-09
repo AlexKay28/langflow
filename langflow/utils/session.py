@@ -53,17 +53,29 @@ class SessionController:
         self.users = {}
 
     def reset_session(self):
+        """
+        Reset session be deletion of all cached users
+        """
         self.users = {}
 
     def get_pairs(self):
+        """
+        Get application adata
+        """
         return self.pairs
 
     def is_user(self, uuid):
+        """
+        Check particular user existance
+        """
         return uuid in self.users.keys()
 
     def create_user(
         self, uuid: str, first_language: str, second_language: str, level: int
     ) -> Tuple[str, bool]:
+        """
+        Create user object and add it in self.users class attribute
+        """
         if len(self.users) > N_MAX_USERS:
             self.reset_session()
         self.users[uuid] = User(uuid, first_language, second_language, level)
@@ -77,6 +89,9 @@ class SessionController:
         return quid, flang, slang
 
     def get_user_phrases(self, uuid: str, quid: str):
+        """
+        Get particular question of particular user
+        """
         question_entity = self.users[uuid].get_question(quid)
         return (
             question_entity["first_language_phrase"],
@@ -84,9 +99,15 @@ class SessionController:
         )
 
     def record_users_result(self, uuid: str, quid: str, equality_rate: float):
+        """
+        Set question status of user
+        """
         self.users[uuid].set_answer_status(quid, equality_rate)
 
     def get_user_analysis(self, uuid: str):
+        """
+        Get user's session analysis
+        """
         return {
             "uuid": uuid,
             "statistics": self.users[uuid].get_user_statistics(),

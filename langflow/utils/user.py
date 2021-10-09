@@ -12,6 +12,9 @@ class User:
         self.questions = {}
 
     def generate_question(self, pairs):
+        """
+        Create question in users metadata
+        """
         quid_generated = str(uuid.uuid4())
         pairs = pairs[
             pairs.level.apply(lambda l: l == self.level if self.level > 0 else True)
@@ -25,10 +28,19 @@ class User:
         return quid_generated, flang, slang
 
     def get_question(self, quid):
+        """
+        Get particular question by quid
+        """
         return self.questions[quid]
 
     def set_answer_status(self, quid, equality_rate):
+        """
+        Add status of answered question
+        """
         self.questions[quid]["status"] = equality_rate
 
     def get_user_statistics(self):
+        """
+        Final statistics about users progress while session
+        """
         return "User is the great student!"
