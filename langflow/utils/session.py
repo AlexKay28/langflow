@@ -64,24 +64,27 @@ class SessionController:
         """
         return self.pairs
 
-    def is_user(self, uuid):
+    def is_user(self, uuid: str):
         """
         Check particular user existance
         """
         return uuid in self.users.keys()
 
     def create_user(
-        self, uuid: str, first_language: str, second_language: str, level: int
+        self, first_language: str, second_language: str, level: int
     ) -> Tuple[str, bool]:
         """
         Create user object and add it in self.users class attribute
         """
+        uuid_generated = str(uuid.uuid4())
         if len(self.users) > N_MAX_USERS:
             self.reset_session()
-        self.users[uuid] = User(uuid, first_language, second_language, level)
-        return uuid, self.is_user(uuid)
+        self.users[uuid_generated] = User(
+            uuid_generated, first_language, second_language, level
+        )
+        return uuid_generated, self.is_user(uuid_generated)
 
-    def generate_phrase_pair(self, uuid) -> Tuple[str, str]:
+    def generate_phrase_pair(self, uuid: str) -> Tuple[str, str]:
         """
         Choose pair of phrases randomly
         """

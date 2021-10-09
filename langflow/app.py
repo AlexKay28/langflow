@@ -35,10 +35,9 @@ def configure_api():
     Start configuring user's session by means of initializations himself
     selecting the languages and level
     Endpoint gets the keys:
-        uuid, first_language, second_language, level
+        first_language, second_language, level
     """
     # get params
-    uuid = request.args["uuid"]
     first_language = request.args["first_language"]
     second_language = request.args["second_language"]
     level = int(request.args["level"])
