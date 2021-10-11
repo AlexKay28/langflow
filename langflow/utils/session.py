@@ -1,4 +1,5 @@
 import os
+import uuid
 import gzip
 import shutil
 import fasttext
@@ -12,7 +13,7 @@ from utils.user import User
 N_MAX_USERS = 25
 PATH_TO_DATA = "data/phrases.csv"
 PATH_TO_MODELS = "language_models/"
-AVAILABLE_MODELS = ["english", "french", "ukrainian", "russian"]
+AVAILABLE_MODELS = ["english", "french"]  # , "ukrainian", "russian"]
 
 
 def load_language_models(extension="gz"):
@@ -82,6 +83,7 @@ class SessionController:
         self.users[uuid_generated] = User(
             uuid_generated, first_language, second_language, level
         )
+        print(self.users)
         return uuid_generated, self.is_user(uuid_generated)
 
     def generate_phrase_pair(self, uuid: str) -> Tuple[str, str]:
