@@ -1,7 +1,7 @@
 import json
 
 from app import session
-from . import api, request
+from . import api, request, jsonify
 
 
 @api.route("/configure", methods=["POST"])
@@ -13,13 +13,14 @@ def configure_api():
         first_language, second_language, level
     """
     # get params
-    first_language = request.args["first_language"]
-    second_language = request.args["second_language"]
-    level = int(request.args["level"])
+    req = request.get_json() if not request.args else request.args
+    first_language = req["first_language"]
+    second_language = req["second_language"]
+    level = int(req["level"])
 
     # init user in session
     uuid_generated, user_existance = session.create_user(
         first_language, second_language, level
     )
 
-    return json.dumps({"uuid": uuid_generated, "status": user_existance})
+    return jsonify({"uuid": uuid_generated, "status": user_existance})

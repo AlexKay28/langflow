@@ -1,20 +1,30 @@
-import pytest
 import json
+import pytest
 
 
-def test_configure_api(client):
-    """Start with a blank session."""
-    mimetype = "application/json"
-    headers = {"Content-Type": mimetype, "Accept": mimetype}
-    message = {
-        "first_language": "english",
-        "second_language": "french",
-        "level": 1,
-    }
-    response = client.post(
-        "configure",
-        data=json.dumps({"title": "123", "body": "333"}),
-        headers=headers,
-    )
-    print(response.__dict__)
-    assert response == 1
+def test_configure_status(client):
+    with client.test_client() as c:
+        rv = c.post(
+            "/configure",
+            json={
+                "first_language": "english",
+                "second_language": "french",
+                "level": "1",
+            },
+        )
+        json_data = rv.get_json()
+        assert json_data["status"]
+
+
+def test_configure_uuid(client, ask_valid_uuid):
+    with client.test_client() as c:
+        rv = c.post(
+            "/configure",
+            json={
+                "first_language": "russian",
+                "second_language": "ukrainian",
+                "level": "2",
+            },
+        )
+        json_data = rv.get_json()
+        assert ask_valid_uuid(json_data["uuid"])

@@ -4,7 +4,7 @@ from app import session
 from utils.tips import show_differences
 from utils.comparing import compare_answers
 
-from . import api, request
+from . import api, request, jsonify
 
 
 @api.route("/answer", methods=["POST"])
@@ -15,9 +15,9 @@ def answer_api():
         uuid, qid, second_language_phrase_answer
     """
     # get params
-    uuid = request.args["uuid"]
-    quid = request.args["quid"]
-    second_language_phrase_answer = request.args["second_language_phrase_answer"]
+    req = request.get_json() if not request.args else request.args
+    uuid, quid = req["uuid"], req["quid"]
+    second_language_phrase_answer = req["second_language_phrase_answer"]
 
     # get question which was asked to user from his metadata
     first_language_phrase, second_language_phrase = session.get_user_phrases(uuid, quid)
@@ -40,7 +40,7 @@ def answer_api():
             second_language_phrase, second_language_phrase_answer
         )
 
-    return json.dumps(
+    return jsonify(
         {
             "uuid": uuid,
             "quid": quid,
