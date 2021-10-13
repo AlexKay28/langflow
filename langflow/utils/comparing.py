@@ -11,7 +11,6 @@ def normalize_form_of_answer(answer: str) -> str:
     Normalize string to the single form which are
     equal in any case of writing style.
     """
-    print(answer)
     answer = answer.lower().strip()
 
     symbols_to_ignore = "!@#$%^&?,.:;"

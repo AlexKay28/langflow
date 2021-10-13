@@ -5,24 +5,35 @@ import fasttext
 import numpy as np
 import pandas as pd
 
+from typing import Tuple
+
+from utils.user import User
+
+N_MAX_USERS = 25
 PATH_TO_DATA = "data/phrases.csv"
 PATH_TO_MODELS = "language_models/"
+AVAILABLE_MODELS = ["english", "french", "ukrainian", "russian"]
 
 
-def extract_language_models(model_name, extension=".gz"):
+def load_language_models(extension="gz"):
     """
     Models are stored as .bit.tar.gz
     Fore session working they are needed to be extracted
     """
-    archive_path = os.path.join(PATH_TO_MODELS, f"{model_name}.gz")
-    model_path = os.path.join(PATH_TO_MODELS, f"{model_name}")
+    models = {}
+    for model_name in AVAILABLE_MODELS:
+        model_name_ext = f"{model_name}5.bin"
+        archive_path = os.path.join(PATH_TO_MODELS, f"{model_name_ext}.{extension}")
+        model_path = os.path.join(PATH_TO_MODELS, f"{model_name_ext}")
 
-    if model_name in os.listdir(PATH_TO_MODELS):
-        return
+        if model_name_ext not in os.listdir(PATH_TO_MODELS):
+            with gzip.open(archive_path, "rb") as file_in:
+                with open(model_path, "wb") as file_out:
+                    shutil.copyfileobj(file_in, file_out)
 
-    with gzip.open(archive_path, "rb") as file_in:
-        with open(model_path, "wb") as file_out:
-            shutil.copyfileobj(file_in, file_out)
+        models[model_name] = fasttext.load_model(model_path)
+
+    return models
 
 
 class SessionController:
@@ -31,52 +42,76 @@ class SessionController:
     for correct question formatting and question selection
     """
 
-    def __init__(self, first_language, second_language, level):
-        self.first_language = first_language
-        self.second_language = second_language
-        self.level = level
-        self.pairs = pd.read_csv(
-            PATH_TO_DATA,
-            usecols=["level", self.first_language, self.second_language],
-        )
-        self.pairs = self.pairs[
-            self.pairs.level.apply(lambda l: l == level if level > 0 else True)
-        ][[self.first_language, self.second_language]].values
+    def __init__(self):
+        # load application data
+        self.pairs = pd.read_csv(PATH_TO_DATA)
 
-        self.model_name = f"{second_language}5.bin"
-        extract_language_models(self.model_name)
-        self.language_model = fasttext.load_model(
-            os.path.join(PATH_TO_MODELS, self.model_name)
-        )
+        # init models
+        self.language_models = load_language_models()
 
         # highly dynamic variable
-        self.questions_query = {}
-
-    @property
-    def is_new_session(self):
-        if questions_query:
-            return False
-        return True
-
-    def get_session_langs_phrases(self, uuid: str):
-        return (
-            self.questions_query[uuid]["first_language_phrase"],
-            self.questions_query[uuid]["second_language_phrase_answer"],
-        )
-
-    def set_session_langs_phrases(
-        self,
-        uuid: str,
-        first_language_phrase: str,
-        second_language_phrase_answer: str,
-    ):
-        self.questions_query[uuid] = {
-            "first_language_phrase": first_language_phrase,
-            "second_language_phrase_answer": second_language_phrase_answer,
-        }
+        self.users = {}
 
     def reset_session(self):
-        self.questions_query = {}
+        """
+        Reset session be deletion of all cached users
+        """
+        self.users = {}
 
     def get_pairs(self):
+        """
+        Get application adata
+        """
         return self.pairs
+
+    def is_user(self, uuid: str):
+        """
+        Check particular user existance
+        """
+        return uuid in self.users.keys()
+
+    def create_user(
+        self, first_language: str, second_language: str, level: int
+    ) -> Tuple[str, bool]:
+        """
+        Create user object and add it in self.users class attribute
+        """
+        uuid_generated = str(uuid.uuid4())
+        if len(self.users) > N_MAX_USERS:
+            self.reset_session()
+        self.users[uuid_generated] = User(
+            uuid_generated, first_language, second_language, level
+        )
+        return uuid_generated, self.is_user(uuid_generated)
+
+    def generate_phrase_pair(self, uuid: str) -> Tuple[str, str]:
+        """
+        Choose pair of phrases randomly
+        """
+        quid, flang, slang = self.users[uuid].generate_question(self.pairs)
+        return quid, flang, slang
+
+    def get_user_phrases(self, uuid: str, quid: str):
+        """
+        Get particular question of particular user
+        """
+        question_entity = self.users[uuid].get_question(quid)
+        return (
+            question_entity["first_language_phrase"],
+            question_entity["second_language_phrase_answer"],
+        )
+
+    def record_users_result(self, uuid: str, quid: str, equality_rate: float):
+        """
+        Set question status of user
+        """
+        self.users[uuid].set_answer_status(quid, equality_rate)
+
+    def get_user_analysis(self, uuid: str):
+        """
+        Get user's session analysis
+        """
+        return {
+            "uuid": uuid,
+            "statistics": self.users[uuid].get_user_statistics(),
+        }
