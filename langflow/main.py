@@ -4,7 +4,6 @@ import numpy as np
 from colorama import Fore, Style
 from collections import Counter
 
-from utils.choosing import generate_phrase_pair
 from utils.tips import show_differences
 from utils.session import SessionController
 from utils.comparing import compare_answers
@@ -28,9 +27,9 @@ def get_session_terminal(first_language="english", second_language="french", lev
     which defines which dataset to use for known and learning language
     """
 
-    session = SessionController(
-        first_language=first_language, second_language=second_language, level=level
-    )
+    session = SessionController()
+    uuid, status = session.create_user(first_language, second_language, level)
+    assert status
 
     bad_answers_counter = Counter()
     actions_counter = 0
@@ -38,9 +37,10 @@ def get_session_terminal(first_language="english", second_language="french", lev
     while 1:
         actions_counter += 1
         (
+            quid,
             first_language_phrase,
             second_language_phrase_answer,
-        ) = generate_phrase_pair(session.get_pairs())
+        ) = session.generate_phrase_pair(uuid)
 
         phrase = f"{Fore.YELLOW}{first_language_phrase}{Style.RESET_ALL}"
         print(f"{{:<25}}>> {{}}".format(f"Phrase #{actions_counter}", phrase))
@@ -48,7 +48,7 @@ def get_session_terminal(first_language="english", second_language="french", lev
         user_answer = input()
 
         comparing_result = compare_answers(
-            session.language_model,
+            second_language,
             second_language_phrase_answer,
             user_answer,
         )
