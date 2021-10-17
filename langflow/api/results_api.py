@@ -1,6 +1,5 @@
 import json
 
-# from app import session
 from . import api, request, jsonify, session
 
 

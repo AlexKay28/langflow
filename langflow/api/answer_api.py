@@ -1,6 +1,5 @@
 import json
 
-# from app import session
 from utils.tips import show_differences
 from utils.comparing import compare_answers
 
