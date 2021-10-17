@@ -5,7 +5,7 @@ from colorama import Fore, Style
 from collections import Counter
 
 from utils.tips import show_differences
-from utils.session import SessionController
+from utils.session_object import SessionController
 from utils.comparing import compare_answers
 
 # Programm iterates over existed data and

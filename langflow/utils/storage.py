@@ -33,7 +33,6 @@ class StorageDB:
 
     def add_user(self, uuid, user_object):
         self.users[uuid] = user_object
-        print(self.users)
 
     def get_user(self, uuid):
         return self.users[uuid]

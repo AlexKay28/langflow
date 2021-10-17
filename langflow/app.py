@@ -2,7 +2,7 @@ import json
 
 from flask import Flask, render_template, url_for, request, redirect
 
-from utils.session import SessionController
+from utils.session_object import SessionController
 
 from api import api
 
