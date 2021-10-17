@@ -11,4 +11,4 @@ const AboutProject = (): JSX.Element => {
     );
 };
 
-export default AboutProject;
+export default AboutProject

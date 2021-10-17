@@ -15,4 +15,4 @@ const CurrentPage = (): JSX.Element => {
     );
 };
 
-export default CurrentPage;
+export default CurrentPage

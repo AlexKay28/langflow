@@ -1,6 +1,6 @@
-import Navbar from 'react-bootstrap/Navbar';
-import Nav from 'react-bootstrap/Nav';
-import Container from 'react-bootstrap/Container';
+import Navbar from 'react-bootstrap/Navbar'
+import Nav from 'react-bootstrap/Nav'
+import Container from 'react-bootstrap/Container'
 import logo from '../../images/logo.png'
 
 const Header = (): JSX.Element => {
@@ -22,4 +22,4 @@ const Header = (): JSX.Element => {
     );
 };
 
-export default Header;
+export default Header

@@ -1,8 +1,8 @@
-import React from "react";
-import CurrentPage from "./components/CurrentPage/CurrentPage";
-import Header from "./components/Header/Header";
+import React from "react"
+import CurrentPage from "./components/CurrentPage/CurrentPage"
+import Header from "./components/Header/Header"
 
-import "./App.css";
+import "./App.css"
 
 class App extends React.Component {
   render() {
@@ -15,4 +15,4 @@ class App extends React.Component {
   }
 }
 
-export default App;
+export default App

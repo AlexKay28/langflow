@@ -1,5 +1,6 @@
 import React from 'react'
 import axios from 'axios'
+import { apiHost } from '../../config.json'
 import './question.scss'
 
 class Question extends React.Component {
@@ -9,7 +10,10 @@ class Question extends React.Component {
         this.state = {
             uuid: '',
             quid: '',
+            answer: '',
             answer_user: '',
+            is_equal: '',
+            score: ''
         }
 
         this.handleInputChange = this.handleInputChange.bind(this);
@@ -21,7 +25,7 @@ class Question extends React.Component {
         this.setState((state) => ({
             ...state, uuid: data.uuid
         }))
-        axios.post(`http://localhost:6767/question?uuid=${data.uuid}`, JSON.stringify(data.uuid))
+        axios.post(`${apiHost}/question?uuid=${data.uuid}`, JSON.stringify(data.uuid))
             .then(res => {
                 const question = res.data.question;
                 const uuid = data.uuid;
@@ -36,7 +40,7 @@ class Question extends React.Component {
             quid: this.state.quid,
             answer_user: this.state.answer_user
         }
-        axios.post(`http://localhost:6767/answer?uuid=${data.uuid}&quid=${data.quid}&second_language_phrase_answer=${data.answer_user}`, JSON.stringify(data))
+        axios.post(`${apiHost}/answer?uuid=${data.uuid}&quid=${data.quid}&second_language_phrase_answer=${data.answer_user}`, JSON.stringify(data))
             .then((response) => {
                 const answer = response.data.answer
                 const is_equal = response.data.is_equal
@@ -83,28 +87,28 @@ class Question extends React.Component {
         const { question, answer, answer_user, score, is_equal } = this.state
         return (
             <div className="vh-100">
-                <div class="centered-element w-100">
-                    <table class="custom-table text-white-50">
+                <div className="centered-element w-100">
+                    <table className="custom-table text-white-50">
                         <tbody>
                         <tr>
-                            <td class="table-header">Translate:</td>
-                            <td class="table-text table-text_translate">{question}</td>
+                            <td className="table-header">Translate:</td>
+                            <td className="table-text table-text_translate">{question}</td>
                         </tr>
                         <tr>
-                            <td class="table-header ">Answer:</td>
-                            <td class="table-text table-text_answer">{answer_user}</td>
+                            <td className="table-header ">Answer:</td>
+                            <td className="table-text table-text_answer">{answer_user}</td>
                         </tr>
                         <tr>
-                            <td class="table-header">Correct answer:</td>
-                            <td class="table-text table-text_correct-answer">{answer}</td>
+                            <td className="table-header">Correct answer:</td>
+                            <td className="table-text table-text_correct-answer">{answer}</td>
                         </tr>
                         <tr>
-                            <td class="table-header">Is equal:</td>
-                            <td class="table-text table-text_correct-answer">{is_equal}</td>
+                            <td className="table-header">Is equal:</td>
+                            <td className="table-text table-text_correct-answer">{is_equal}</td>
                         </tr>
                         <tr>
-                            <td class="table-header">Score:</td>
-                            <td class="table-text table-text_correct-answer">{score}</td>
+                            <td className="table-header">Score:</td>
+                            <td className="table-text table-text_correct-answer">{score}</td>
                         </tr>
                         </tbody>
                     </table>
@@ -122,4 +126,4 @@ class Question extends React.Component {
 }
 
 
-export default Question;
+export default Question
