@@ -6,7 +6,7 @@ from flask import Flask, jsonify, request
 sys.path.append("../langflow")
 
 from api import api
-from utils.session import SessionController
+from utils.session_object import SessionController
 
 
 @pytest.fixture
