@@ -47,7 +47,7 @@ def configure_api():
 
     # init user in session
     uuid_generated, user_existance = session.create_user(
-        uuid, first_language, second_language, level
+        first_language, second_language, level
     )
 
     return json.dumps({"uuid": uuid_generated, "status": user_existance})

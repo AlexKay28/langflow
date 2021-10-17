@@ -6,7 +6,6 @@ import MenuItem from '@material-ui/core/MenuItem';
 import FormControl from '@material-ui/core/FormControl';
 import Select, { SelectChangeEvent } from '@material-ui/core/Select';
 import axios from 'axios';
-const querystring = require('querystring');
 
 export const useStyles = makeStyles(() => ({
 	button: {
@@ -22,7 +21,6 @@ const GoPractice = (): JSX.Element => {
     const [openLevel, setOpenLevel] = React.useState(false);
     const [openFirstLanguage, setOpenFirstLanguage] = React.useState(false);
     const [openSecondLanguage, setOpenSecondLanguage] = React.useState(false);
-    const [data, setData] = React.useState<object>();
   
     const handleChangeFirstLanguage = (event: SelectChangeEvent<typeof firstLanguage>) => {
         setFirstLanguage(event.target.value);
@@ -37,18 +35,14 @@ const GoPractice = (): JSX.Element => {
     };
 
     const handleClick = () => {
-        const data = {
+        const dataConfig = {
             first_language: firstLanguage,
             second_language: secondLanguage,
             level: level
         }
-        console.log(data);
-        axios.post(`http://localhost:6767/configure?first_language=${data.first_language}&second_language=${data.second_language}&level=${data.level}`, JSON.stringify(data))
-            .then((response) => {
-                console.log(response.data);
-                
-                // const answer = response.data
-                // setData({ answer });
+        axios.post(`http://localhost:6767/configure?first_language=${dataConfig.first_language}&second_language=${dataConfig.second_language}&level=${dataConfig.level}`, JSON.stringify(dataConfig))
+            .then(response => {
+                window.localStorage.setItem('dataUuid', JSON.stringify(response.data))
             })
             .catch((error) => {
                 console.log(error);
@@ -135,12 +129,10 @@ const GoPractice = (): JSX.Element => {
                     <MenuItem value={2}>2</MenuItem>
                     </Select>
                 </FormControl>
-                <Link style={{ fontSize: '36px' }} color="inherit" underline="none" className="btn btn-success" onClick={handleClick}>Go practice!</Link>
+                <Link href='/question' style={{ fontSize: '36px' }} color="inherit" underline="none" className="btn btn-success" onClick={handleClick}>Go practice!</Link>
             </div>
         </div>
     );
 }
-
-// href='/question'
 
 export default GoPractice;

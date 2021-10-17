@@ -1,4 +1,5 @@
 import os
+import uuid
 import gzip
 import shutil
 import fasttext

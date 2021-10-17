@@ -1,7 +1,6 @@
 import React from 'react'
 import axios from 'axios'
 import './question.scss'
-const querystring = require('querystring');
 
 class Question extends React.Component {
     constructor(props) {
@@ -9,28 +8,41 @@ class Question extends React.Component {
     
         this.state = {
             uuid: '',
+            quid: '',
             answer_user: '',
         }
 
-        this.handleEmailChange = this.handleEmailChange.bind(this);
-        this.handleQuestionSubmit = this.handleQuestionSubmit.bind(this);
+        this.handleInputChange = this.handleInputChange.bind(this);
         this.handleAnswerSubmit = this.handleAnswerSubmit.bind(this);
-        this.handleAnswerSubmitFirst = this.handleAnswerSubmitFirst.bind(this);
     }
 
     componentDidMount() {
-        console.log('check');
+        const data = JSON.parse(window.localStorage.getItem('dataUuid'));
+        this.setState((state) => ({
+            ...state, uuid: data.uuid
+        }))
+        axios.post(`http://localhost:6767/question?uuid=${data.uuid}`, JSON.stringify(data.uuid))
+            .then(res => {
+                const question = res.data.question;
+                const uuid = data.uuid;
+                const quid = res.data.quid;
+                this.setState({ question, uuid, quid});
+        })
     }
 
-    handleQuestionSubmit() {
+    handleAnswerSubmit() {
         const data = {
             uuid: this.state.uuid,
+            quid: this.state.quid,
             answer_user: this.state.answer_user
         }
-        axios.post(`http://localhost:6767/answer?uuid=${data.uuid}&second_language_phrase_answer=${data.answer_user}`, querystring.stringify(data))
+        axios.post(`http://localhost:6767/answer?uuid=${data.uuid}&quid=${data.quid}&second_language_phrase_answer=${data.answer_user}`, JSON.stringify(data))
             .then((response) => {
-                const answer = response.data
-                this.setState({ answer });
+                const answer = response.data.answer
+                const is_equal = response.data.is_equal
+                const score = response.data.score
+                const differences = response.data.differences
+                this.setState({ answer, is_equal, score, differences });
             })
             .catch((error) => {
                 console.log(error);
@@ -38,47 +50,27 @@ class Question extends React.Component {
         this.setState({ isAnswer: true});
     }
 
-    handleAnswerSubmit() {
-        axios.get(`http://localhost:6767/question`)
-            .then(res => {
-                const question = res.data.question;
-                const uuid = res.data.uuid;
-                this.setState({ question, uuid});
-        })
-        this.setState({ isAnswer: false});
-    }
-
-    handleAnswerSubmitFirst() {
-        axios.get(`http://localhost:6767/question`)
-            .then(res => {
-                const question = res.data.question;
-                const uuid = res.data.uuid;
-                this.setState({ question, uuid});
-        })
-    }
-
-    handleEmailChange(event) {
+    handleInputChange(event) {
         this.setState({answer_user: event.target.value});
     }
 
     renderQuestion() {
         const { question } = this.state
-        console.log(this.state);
         return (
             <div className="vh-100">
                 <div className="centered-element">
                     <h2>Translate: {question}</h2>
-                    <form onSubmit={this.handleQuestionSubmit}>
+                    <form onSubmit={this.handleAnswerSubmit}>
                         <div className="input-group mb-3">
                             <input 
                                 type="string" 
                                 className="form-control" 
                                 placeholder="Enter text" 
                                 autoComplete="off"
-                                onChange={this.handleEmailChange}
+                                onChange={this.handleInputChange}
                             />
                             <div className="input-group-append">
-                                <button className="btn btn-secondary" type="submit" onClick={this.handleQuestionSubmit}>Enter</button>
+                                <button className="btn btn-secondary" type="submit" onClick={this.handleAnswerSubmit}>Enter</button>
                             </div>
                         </div>
                     </form>
@@ -88,8 +80,7 @@ class Question extends React.Component {
     }
 
     renderAnswer() {
-        // const { answer } = this.state.answer
-        console.log(this.state.answer);
+        const { question, answer, answer_user, score, is_equal } = this.state
         return (
             <div className="vh-100">
                 <div class="centered-element w-100">
@@ -97,23 +88,23 @@ class Question extends React.Component {
                         <tbody>
                         <tr>
                             <td class="table-header">Translate:</td>
-                            <td class="table-text table-text_translate">{}</td>
+                            <td class="table-text table-text_translate">{question}</td>
                         </tr>
                         <tr>
                             <td class="table-header ">Answer:</td>
-                            <td class="table-text table-text_answer">{}</td>
+                            <td class="table-text table-text_answer">{answer_user}</td>
                         </tr>
                         <tr>
                             <td class="table-header">Correct answer:</td>
-                            <td class="table-text table-text_correct-answer">{}</td>
+                            <td class="table-text table-text_correct-answer">{answer}</td>
                         </tr>
                         <tr>
                             <td class="table-header">Is equal:</td>
-                            <td class="table-text table-text_correct-answer">{}</td>
+                            <td class="table-text table-text_correct-answer">{is_equal}</td>
                         </tr>
                         <tr>
                             <td class="table-header">Score:</td>
-                            <td class="table-text table-text_correct-answer">{}</td>
+                            <td class="table-text table-text_correct-answer">{score}</td>
                         </tr>
                         </tbody>
                     </table>
