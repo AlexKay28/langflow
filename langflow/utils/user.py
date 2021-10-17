@@ -22,7 +22,9 @@ class User:
         flang, slang = pairs[np.random.choice(len(pairs))]
         flang, slang = flang.lower().capitalize(), slang.lower().capitalize()
         self.questions[quid_generated] = {
+            "first_language": self.first_language,
             "first_language_phrase": flang.lower().capitalize(),
+            "second_language": self.second_language,
             "second_language_phrase_answer": slang.lower().capitalize(),
         }
         return quid_generated, flang, slang
