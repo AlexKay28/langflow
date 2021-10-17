@@ -1,8 +1,5 @@
 import os
 import uuid
-import gzip
-import shutil
-import fasttext
 import numpy as np
 import pandas as pd
 
@@ -12,29 +9,6 @@ from utils.user import User
 from utils.storage import StorageDB
 
 N_MAX_USERS = 25
-PATH_TO_MODELS = "language_models/"
-AVAILABLE_MODELS = ["english", "french"]  # , "ukrainian", "russian"]
-
-
-def load_language_models(extension="gz"):
-    """
-    Models are stored as .bit.tar.gz
-    Fore session working they are needed to be extracted
-    """
-    models = {}
-    for model_name in AVAILABLE_MODELS:
-        model_name_ext = f"{model_name}5.bin"
-        archive_path = os.path.join(PATH_TO_MODELS, f"{model_name_ext}.{extension}")
-        model_path = os.path.join(PATH_TO_MODELS, f"{model_name_ext}")
-
-        if model_name_ext not in os.listdir(PATH_TO_MODELS):
-            with gzip.open(archive_path, "rb") as file_in:
-                with open(model_path, "wb") as file_out:
-                    shutil.copyfileobj(file_in, file_out)
-
-        models[model_name] = fasttext.load_model(model_path)
-
-    return models
 
 
 class SessionController:
@@ -44,9 +18,6 @@ class SessionController:
     """
 
     def __init__(self):
-        # init models
-        self.language_models = load_language_models()
-
         # data and users database
         self.db = StorageDB()
 
@@ -85,7 +56,9 @@ class SessionController:
         user = self.db.get_user(uuid)
         question_entity = user.get_question(quid)
         return (
+            question_entity["first_language"],
             question_entity["first_language_phrase"],
+            question_entity["second_language"],
             question_entity["second_language_phrase_answer"],
         )
 

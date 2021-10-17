@@ -20,12 +20,16 @@ def answer_api():
     second_language_phrase_answer = req["second_language_phrase_answer"]
 
     # get question which was asked to user from his metadata
-    first_language_phrase, second_language_phrase = session.get_user_phrases(uuid, quid)
+    (
+        first_language,
+        first_language_phrase,
+        second_language,
+        second_language_phrase,
+    ) = session.get_user_phrases(uuid, quid)
 
     # apply models to compare answer and get inference
-    model_to_apply = session.language_models[session.users[uuid].second_language]
     comparing_result = compare_answers(
-        model_to_apply, second_language_phrase, second_language_phrase_answer
+        second_language, second_language_phrase, second_language_phrase_answer
     )
     is_equal = comparing_result["is_equal"]
     equality_rate = comparing_result["equality_rate"]

@@ -18,4 +18,7 @@ def results_api():
     # calculate user's data analysis obtained while session
     analysis = session.get_user_analysis(uuid)
 
+    # will be removed in #39
+    # session.db.update_data()
+
     return jsonify(analysis)
