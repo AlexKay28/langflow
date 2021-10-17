@@ -4,29 +4,8 @@ import pytest
 
 def test_answer_uuid(client, session, ask_valid_uuid):
     with client.test_client() as c:
-        # create user
-        rv = c.post(
-            "/configure",
-            json={
-                "first_language": "russian",
-                "second_language": "ukrainian",
-                "level": "2",
-            },
-        )
-        json_data = rv.get_json()
-        uuid = json_data["uuid"]
-
-        # create question
-        rv = c.post(
-            "/question",
-            json={
-                "uuid": uuid,
-            },
-        )
-        json_data = rv.get_json()
-        uuid = json_data["uuid"]
-        quid = json_data["quid"]
-
+        uuid = next(iter(session.db.users))
+        quid = next(iter(session.db.get_user(uuid).questions))
         # send answer
         rv = c.post(
             "/question",

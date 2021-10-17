@@ -1,7 +1,9 @@
-import os
+import sys
 import pytest
 from uuid import UUID
 from flask import Flask, jsonify, request
+
+sys.path.append("../langflow")
 
 from api import api
 from utils.session import SessionController
@@ -17,7 +19,6 @@ def client():
 @pytest.fixture
 def session():
     session = SessionController()
-    print(session)
     return session
 
 

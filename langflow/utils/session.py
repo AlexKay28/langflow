@@ -9,9 +9,9 @@ import pandas as pd
 from typing import Tuple
 
 from utils.user import User
+from utils.storage import StorageDB
 
 N_MAX_USERS = 25
-PATH_TO_DATA = "data/phrases.csv"
 PATH_TO_MODELS = "language_models/"
 AVAILABLE_MODELS = ["english", "french"]  # , "ukrainian", "russian"]
 
@@ -44,32 +44,17 @@ class SessionController:
     """
 
     def __init__(self):
-        # load application data
-        self.pairs = pd.read_csv(PATH_TO_DATA)
-
         # init models
         self.language_models = load_language_models()
 
-        # highly dynamic variable
-        self.users = {}
-
-    def reset_session(self):
-        """
-        Reset session be deletion of all cached users
-        """
-        self.users = {}
-
-    def get_pairs(self):
-        """
-        Get application adata
-        """
-        return self.pairs
+        # data and users database
+        self.db = StorageDB()
 
     def is_user(self, uuid: str):
         """
         Check particular user existance
         """
-        return uuid in self.users.keys()
+        return uuid in self.db.users_uuid_list
 
     def create_user(
         self, first_language: str, second_language: str, level: int
@@ -77,27 +62,28 @@ class SessionController:
         """
         Create user object and add it in self.users class attribute
         """
+        if len(self.db.users_uuid_list) > N_MAX_USERS:
+            self.db.reset_users()
         uuid_generated = str(uuid.uuid4())
-        if len(self.users) > N_MAX_USERS:
-            self.reset_session()
-        self.users[uuid_generated] = User(
-            uuid_generated, first_language, second_language, level
-        )
-        print(self.users)
+        user = User(uuid_generated, first_language, second_language, level)
+        self.db.add_user(uuid_generated, user)
         return uuid_generated, self.is_user(uuid_generated)
 
     def generate_phrase_pair(self, uuid: str) -> Tuple[str, str]:
         """
         Choose pair of phrases randomly
         """
-        quid, flang, slang = self.users[uuid].generate_question(self.pairs)
-        return quid, flang, slang
+        user = self.db.get_user(uuid)
+        pairs = self.db.get_pairs()
+        quid, first_lang, second_lang = user.generate_question(pairs)
+        return quid, first_lang, second_lang
 
     def get_user_phrases(self, uuid: str, quid: str):
         """
         Get particular question of particular user
         """
-        question_entity = self.users[uuid].get_question(quid)
+        user = self.db.get_user(uuid)
+        question_entity = user.get_question(quid)
         return (
             question_entity["first_language_phrase"],
             question_entity["second_language_phrase_answer"],
@@ -107,13 +93,15 @@ class SessionController:
         """
         Set question status of user
         """
-        self.users[uuid].set_answer_status(quid, equality_rate)
+        user = self.db.get_user(uuid)
+        user.set_answer_status(quid, equality_rate)
 
     def get_user_analysis(self, uuid: str):
         """
         Get user's session analysis
         """
+        user = self.db.get_user(uuid)
         return {
             "uuid": uuid,
-            "statistics": self.users[uuid].get_user_statistics(),
+            "statistics": user.get_user_statistics(),
         }
