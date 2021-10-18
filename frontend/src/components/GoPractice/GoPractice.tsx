@@ -5,8 +5,7 @@ import InputLabel from '@material-ui/core/InputLabel'
 import MenuItem from '@material-ui/core/MenuItem'
 import FormControl from '@material-ui/core/FormControl'
 import Select, { SelectChangeEvent } from '@material-ui/core/Select'
-import axios from 'axios'
-import { apiHost } from '../../config.json'
+import api from "../../utils/api";
 
 export const useStyles = makeStyles(() => ({
 	button: {
@@ -41,7 +40,7 @@ const GoPractice = (): JSX.Element => {
             second_language: secondLanguage,
             level: level
         }
-        axios.post(`${apiHost}/configure?first_language=${dataConfig.first_language}&second_language=${dataConfig.second_language}&level=${dataConfig.level}`, JSON.stringify(dataConfig))
+        api.post(`/configure?first_language=${dataConfig.first_language}&second_language=${dataConfig.second_language}&level=${dataConfig.level}`, JSON.stringify(dataConfig))
             .then(response => {
                 window.localStorage.setItem('dataUuid', JSON.stringify(response.data))
             })

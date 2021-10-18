@@ -1,6 +1,5 @@
 import React from 'react'
-import axios from 'axios'
-import { apiHost } from '../../config.json'
+import api from "../../utils/api";
 import './question.scss'
 
 class Question extends React.Component {
@@ -25,7 +24,7 @@ class Question extends React.Component {
         this.setState((state) => ({
             ...state, uuid: data.uuid
         }))
-        axios.post(`${apiHost}/question?uuid=${data.uuid}`, JSON.stringify(data.uuid))
+        api.post(`/question?uuid=${data.uuid}`, JSON.stringify(data.uuid))
             .then(res => {
                 const question = res.data.question;
                 const uuid = data.uuid;
@@ -40,7 +39,7 @@ class Question extends React.Component {
             quid: this.state.quid,
             answer_user: this.state.answer_user
         }
-        axios.post(`${apiHost}/answer?uuid=${data.uuid}&quid=${data.quid}&second_language_phrase_answer=${data.answer_user}`, JSON.stringify(data))
+        api.post(`/answer?uuid=${data.uuid}&quid=${data.quid}&second_language_phrase_answer=${data.answer_user}`, JSON.stringify(data))
             .then((response) => {
                 const answer = response.data.answer
                 const is_equal = response.data.is_equal
