@@ -11,23 +11,5 @@ app.register_blueprint(api)
 CORS(app)
 
 
-@app.route("/", methods=["POST", "GET"])
-def home_page():
-    """
-    Main page of LangFlow
-    """
-    if request.method == "POST":  # make GET
-        return redirect("/practice")
-    return render_template("index.html")
-
-
-@app.route("/practice", methods=["GET"])  # it will be removed soon
-def practice_page():
-    """
-    Practicing page # make GET
-    """
-    return render_template("practice.html")
-
-
 if __name__ == "__main__":
     app.run(host="localhost", port=6767, debug=True)

@@ -1,12 +1,27 @@
 version: '3.2'
 services:
-    app:
+    backend:
         build:
-          context: ./langflow
+          context: ./backend
           dockerfile: Dockerfile
-        image: langflow
-        container_name: langflow_application
+        image: langflow_back:v0.1
+        container_name: langflow_application_back
+        volumes:
+          - ./backend:/backend
         ports:
           - 6767:6767
         network_mode: host
-        command: bash -c "python app.py"
+        command: python app.py
+
+    frontend:
+        build:
+          context: ./frontend
+          dockerfile: Dockerfile
+        image: langflow_front:v0.1
+        container_name: langflow_application_front
+        volumes:
+          - ./frontend:/frontend
+        ports:
+          - 3000:3000
+        network_mode: host
+        command: npm start
