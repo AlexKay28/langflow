@@ -1,10 +1,9 @@
 import json
 
-from app import session
 from utils.tips import show_differences
 from utils.comparing import compare_answers
 
-from . import api, request, jsonify
+from . import api, request, jsonify, session
 
 
 @api.route("/answer", methods=["POST"])

@@ -1,0 +1,18 @@
+$this: '.our_team';
+
+#{$this} {
+    & .font-weight-medium {
+        font-weight: 500;
+    }
+
+    h5 {
+        line-height: 22px;
+        font-size: 18px;
+    }
+
+    & .subtitle {
+        color: #8d97ad;
+        line-height: 24px;
+            font-size: 13px;
+    }
+}

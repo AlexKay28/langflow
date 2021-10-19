@@ -2,14 +2,13 @@ import json
 
 from flask import Flask, render_template, url_for, request, redirect
 
-from utils.session import SessionController
-
 from api import api
+
+from flask_cors import CORS
 
 app = Flask(__name__)
 app.register_blueprint(api)
-
-session = SessionController()
+CORS(app)
 
 
 @app.route("/", methods=["POST", "GET"])

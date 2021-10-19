@@ -1,7 +1,6 @@
 import json
 
-from app import session
-from . import api, request, jsonify
+from . import api, request, jsonify, session
 
 
 @api.route("/configure", methods=["POST"])

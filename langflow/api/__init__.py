@@ -1,5 +1,7 @@
 from flask import Blueprint, request, jsonify
+from utils.session_object import SessionController
 
+session = SessionController()
 api = Blueprint("api", __name__)
 
 from .configure_api import configure_api
