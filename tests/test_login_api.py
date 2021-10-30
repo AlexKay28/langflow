@@ -5,11 +5,10 @@ import pytest
 def test_configure_status(client):
     with client.test_client() as c:
         rv = c.post(
-            "/configure",
+            "/login",
             json={
-                "first_language": "english",
-                "second_language": "french",
-                "level": "1",
+                "username": "username",
+                "password": "password",
             },
         )
         json_data = rv.get_json()
@@ -19,12 +18,11 @@ def test_configure_status(client):
 def test_configure_uuid(client, ask_valid_uuid):
     with client.test_client() as c:
         rv = c.post(
-            "/configure",
+            "/login",
             json={
-                "first_language": "russian",
-                "second_language": "ukrainian",
-                "level": "2",
+                "username": "username",
+                "password": "password",
             },
         )
         json_data = rv.get_json()
-        assert ask_valid_uuid(json_data["uuid"])
+        assert ask_valid_uuid(json_data["session_token"])

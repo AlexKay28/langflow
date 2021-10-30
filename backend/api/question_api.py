@@ -10,20 +10,40 @@ def question_api():
     Endpoint gets the keys:
         uuid,
     """
-    # get params
-    req = request.get_json() if not request.args else request.args
-    uuid = req["uuid"]
+    try:
+        if request.method == "POST":
+            # get params
+            req = request.get_json()
+            session_token = req["session_token"]
+            first_language = req["first_language"]
+            second_language = req["second_language"]
+            level = int(req["level"])
 
-    # smart question generation
-    quid, first_language_phrase, second_language_phrase = session.generate_phrase_pair(
-        uuid
-    )
+            # get uuid using session_token
+            uuid = session_token
 
-    return jsonify(
-        {
-            "uuid": uuid,
-            "quid": quid,
-            "question": first_language_phrase,
-            "answer": second_language_phrase,
-        }
-    )
+            # smart question generation
+            (
+                quid,
+                first_language_phrase,
+                second_language_phrase,
+            ) = session.generate_phrase_pair(
+                uuid, first_language, second_language, level
+            )
+
+            return jsonify(
+                {
+                    "quid": quid,
+                    "question": first_language_phrase,
+                    "answer": second_language_phrase,
+                }
+            )
+        else:
+            return jsonify(
+                {
+                    "status": 405,
+                    "message": f"This method is not allowed for the requested URL",
+                }
+            )
+    except Exception as e:
+        return jsonify({"status": 400, "message": f"Bad request. {e}"})

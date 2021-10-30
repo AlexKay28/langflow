@@ -4,7 +4,7 @@ import pytest
 
 def test_endpoints_existance(client):
     rules = [
-        "api.configure_api",
+        "api.login_api",
         "api.question_api",
         "api.answer_api",
         "api.results_api",

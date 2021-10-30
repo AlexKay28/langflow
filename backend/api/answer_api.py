@@ -6,52 +6,64 @@ from utils.comparing import compare_answers
 from . import api, request, jsonify, session
 
 
-@api.route("/answer", methods=["POST"])
+@api.route("/answer", methods=["PATCH"])
 def answer_api():
     """
     Evaluate users answer and return him the answer analysis back
     Endpoint gets the keys:
         uuid, qid, second_language_phrase_answer
     """
-    # get params
-    req = request.get_json() if not request.args else request.args
-    uuid, quid = req["uuid"], req["quid"]
-    second_language_phrase_answer = req["second_language_phrase_answer"]
+    try:
+        if request.method == "PATCH":
+            # get params
+            req = request.get_json()
+            session_token = req["session_token"]
+            quid = req["quid"]
+            user_answer = req["user_answer"]
 
-    # get question which was asked to user from his metadata
-    (
-        first_language,
-        first_language_phrase,
-        second_language,
-        second_language_phrase,
-    ) = session.get_user_phrases(uuid, quid)
+            # get uuid using session_token
+            uuid = session_token
 
-    # apply models to compare answer and get inference
-    comparing_result = compare_answers(
-        second_language, second_language_phrase, second_language_phrase_answer
-    )
-    is_equal = comparing_result["is_equal"]
-    equality_rate = comparing_result["equality_rate"]
+            # get question which was asked to user from his metadata
+            (
+                first_language,
+                first_language_phrase,
+                second_language,
+                second_language_phrase,
+            ) = session.get_user_phrases(uuid, quid)
 
-    # records users success/fail in his metadata
-    session.record_users_result(uuid, quid, equality_rate)
+            # apply models to compare answer and get inference
+            comparing_result = compare_answers(
+                second_language, second_language_phrase, user_answer
+            )
+            is_equal = comparing_result["is_equal"]
+            equality_rate = comparing_result["equality_rate"]
 
-    # generate tips for user
-    differences = ""
-    if not is_equal:
-        differences = show_differences(
-            second_language_phrase, second_language_phrase_answer
-        )
+            # records users success/fail in his metadata
+            session.record_users_result(uuid, quid, equality_rate)
 
-    return jsonify(
-        {
-            "uuid": uuid,
-            "quid": quid,
-            "question": first_language_phrase,
-            "answer": second_language_phrase,
-            "answer_user": second_language_phrase_answer,
-            "is_equal": is_equal,
-            "score": equality_rate,
-            "differences": differences,
-        }
-    )
+            # generate tips for user
+            differences = ""
+            if not is_equal:
+                differences = show_differences(second_language_phrase, user_answer)
+
+            return jsonify(
+                {
+                    "quid": quid,
+                    "question": first_language_phrase,
+                    "answer": second_language_phrase,
+                    "answer_user": user_answer,
+                    "is_equal": is_equal,
+                    "score": equality_rate,
+                    "differences": differences,
+                }
+            )
+        else:
+            return jsonify(
+                {
+                    "status": 405,
+                    "message": f"This method is not allowed for the requested URL",
+                }
+            )
+    except Exception as e:
+        return jsonify({"status": 500, "message": f"Internal Server Error. {e}"})
