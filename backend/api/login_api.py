@@ -15,10 +15,12 @@ def login_api():
         is_anon = req["is_anon"]
 
         if not is_anon:
+            # user autorization to server.
             session_token_generated, user_existance = session.create_user(
                 username, password
             )
         else:
+            # user works anonymously
             session_token_generated, user_existance = session.create_user(
                 username, password
             )
