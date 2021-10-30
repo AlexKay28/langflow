@@ -19,7 +19,9 @@ def login_api():
                 username, password
             )
         else:
-            pass  # TODO
+            session_token_generated, user_existance = session.create_user(
+                username, password
+            )
 
         return jsonify(
             {"session_token": session_token_generated, "status": user_existance}
