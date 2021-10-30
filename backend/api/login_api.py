@@ -3,7 +3,7 @@ import json
 from . import api, request, jsonify, session
 
 
-@api.route("/login", methods=["POST", "GET"])
+@api.route("/login", methods=["POST"])
 def login_api():
     """
     User login endpoint.
