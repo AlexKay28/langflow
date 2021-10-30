@@ -7,9 +7,10 @@ def test_answer_uuid(client, session, ask_valid_uuid):
         session_token = next(iter(session.db.users))
         rv = c.get(
             "/results",
-            json={
+            headers={
                 "session_token": session_token,
             },
+            json={},
         )
         json_data = rv.get_json()
         uuid = json_data["uuid"]

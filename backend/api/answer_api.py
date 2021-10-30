@@ -14,8 +14,10 @@ def answer_api():
         uuid, qid, second_language_phrase_answer
     """
     try:
+        # auth
+        session_token = request.headers.get("session_token")
+
         req = request.get_json()
-        session_token = req["session_token"]
         quid = req["quid"]
         user_answer = req["user_answer"]
 

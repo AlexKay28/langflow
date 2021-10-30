@@ -11,8 +11,10 @@ def question_api():
         uuid,
     """
     try:
+        # auth
+        session_token = request.headers.get("session_token")
+
         req = request.get_json()
-        session_token = req["session_token"]
         first_language = req["first_language"]
         second_language = req["second_language"]
         level = int(req["level"])

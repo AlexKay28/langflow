@@ -11,8 +11,12 @@ def results_api():
         uuid
     """
     try:
-        req = request.get_json()
-        uuid = req["session_token"]
+        # auth
+        session_token = request.headers.get("session_token")
+
+        # get uuid using session_token
+        uuid = session_token
+
         analysis = session.get_user_analysis(uuid)
         return jsonify(analysis)
     except Exception as e:

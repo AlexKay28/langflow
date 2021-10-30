@@ -3,7 +3,7 @@ import pytest
 from uuid import UUID
 from flask import Flask, jsonify, request
 
-sys.path.append("/home/alexkay/mygit/langflow/backend")
+sys.path.append("../backend")
 
 from api import api
 from utils.session_object import SessionController

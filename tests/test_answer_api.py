@@ -9,8 +9,10 @@ def test_answer_uuid(client, session, ask_valid_uuid):
         # send answer
         rv = c.patch(
             "/answer",
-            json={
+            headers={
                 "session_token": session_token,
+            },
+            json={
                 "quid": quid,
                 "user_answer": "this is answer on second language",
             },
