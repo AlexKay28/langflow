@@ -11,39 +11,26 @@ def question_api():
         uuid,
     """
     try:
-        if request.method == "POST":
-            # get params
-            req = request.get_json()
-            session_token = req["session_token"]
-            first_language = req["first_language"]
-            second_language = req["second_language"]
-            level = int(req["level"])
+        req = request.get_json()
+        session_token = req["session_token"]
+        first_language = req["first_language"]
+        second_language = req["second_language"]
+        level = int(req["level"])
 
-            # get uuid using session_token
-            uuid = session_token
+        # get uuid using session_token
+        uuid = session_token
 
-            # smart question generation
-            (
-                quid,
-                first_language_phrase,
-                second_language_phrase,
-            ) = session.generate_phrase_pair(
-                uuid, first_language, second_language, level
-            )
-
-            return jsonify(
-                {
-                    "quid": quid,
-                    "question": first_language_phrase,
-                    "answer": second_language_phrase,
-                }
-            )
-        else:
-            return jsonify(
-                {
-                    "status": 405,
-                    "message": f"This method is not allowed for the requested URL",
-                }
-            )
+        (
+            quid,
+            first_language_phrase,
+            second_language_phrase,
+        ) = session.generate_phrase_pair(uuid, first_language, second_language, level)
+        return jsonify(
+            {
+                "quid": quid,
+                "question": first_language_phrase,
+                "answer": second_language_phrase,
+            }
+        )
     except Exception as e:
         return jsonify({"status": 400, "message": f"Bad request. {e}"})
