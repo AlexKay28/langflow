@@ -8,6 +8,9 @@ from typing import Tuple
 from utils.user import User
 from utils.storage import StorageDB
 
+from dbase import db
+from dbase.users import UserAuthorized, UserAnon
+
 N_MAX_USERS = 25
 
 
@@ -27,16 +30,28 @@ class SessionController:
         """
         return uuid in self.db.users_uuid_list
 
-    def create_user(self, username: str, password: str) -> Tuple[str, bool]:
+    def activate_session_token(
+        self, username: str, password: str, is_anon: bool
+    ) -> Tuple[str, bool]:
         """
-        Create user object and add it in self.users class attribute
+        Activate user session
         """
-        if len(self.db.users_uuid_list) > N_MAX_USERS:
-            self.db.reset_users()
-        uuid_generated = str(uuid.uuid4())
-        user = User(uuid_generated, None, None, None)
-        self.db.add_user(uuid_generated, user)
-        return uuid_generated, self.is_user(uuid_generated)
+
+        if is_anon:
+            uuid_generated = uuid.uuid4()
+            session_token_generated = uuid.uuid4()
+            u = UserAnon(
+                username=username,
+                uuid=uuid_generated,
+                session_token=session_token_generated,
+            )
+            db.session.add(u)
+            db.session.commit()
+        else:
+            # TODO
+            raise NotImplementedError
+
+        return session_token_generated, self.is_user(uuid_generated)
 
     def generate_phrase_pair(
         self, uuid: str, first_language: str, second_language: str, level: int
@@ -45,6 +60,7 @@ class SessionController:
         Choose pair of phrases randomly
         """
         user = self.db.get_user(uuid)
+
         user.first_language = first_language
         user.second_language = second_language
         user.level = level
