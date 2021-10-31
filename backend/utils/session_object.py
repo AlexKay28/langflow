@@ -10,6 +10,8 @@ from utils.storage import StorageDB
 
 from dbase import db
 from dbase.users import UserAuthorized, UserAnon
+from dbase.actions import Action
+from dbase.phrases import Phrase
 
 N_MAX_USERS = 25
 
