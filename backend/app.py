@@ -1,10 +1,10 @@
 import json
 
-from flask import Flask, render_template, url_for, request, redirect
+from flask import Flask
+from flask_cors import CORS
 
 from api import api
 
-from flask_cors import CORS
 
 app = Flask(__name__)
 app.register_blueprint(api)

@@ -4,12 +4,13 @@ import pytest
 
 def test_answer_uuid(client, session, ask_valid_uuid):
     with client.test_client() as c:
-        uuid = next(iter(session.db.users))
-        rv = c.post(
+        session_token = next(iter(session.db.users))
+        rv = c.get(
             "/results",
-            json={
-                "uuid": uuid,
+            headers={
+                "session_token": session_token,
             },
+            json={},
         )
         json_data = rv.get_json()
         uuid = json_data["uuid"]

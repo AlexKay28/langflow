@@ -3,21 +3,21 @@ import json
 from . import api, request, jsonify, session
 
 
-@api.route("/results", methods=["POST"])
+@api.route("/results", methods=["GET"])
 def results_api():
     """
     Final statistics about users progress while session
     Endpoint gets the keys:
         uuid
     """
-    # get params
-    req = request.get_json() if not request.args else request.args
-    uuid = req["uuid"]
+    try:
+        # auth
+        session_token = request.headers.get("session_token")
 
-    # calculate user's data analysis obtained while session
-    analysis = session.get_user_analysis(uuid)
+        # get uuid using session_token
+        uuid = session_token
 
-    # will be removed in #39
-    # session.db.update_data()
-
-    return jsonify(analysis)
+        analysis = session.get_user_analysis(uuid)
+        return jsonify(analysis)
+    except Exception as e:
+        return jsonify({"status": 500, "message": f"Internal Server Error. {e}"})
