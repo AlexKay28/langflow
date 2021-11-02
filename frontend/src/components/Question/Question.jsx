@@ -10,7 +10,7 @@ class Question extends React.Component {
             uuid: '',
             quid: '',
             answer: '',
-            answer_user: '',
+            user_answer: '',
             is_equal: '',
             score: ''
         }
@@ -20,32 +20,33 @@ class Question extends React.Component {
     }
 
     componentDidMount() {
-        const data = JSON.parse(window.localStorage.getItem('dataUuid'));
+        const session_token = window.localStorage.getItem('session_token');
         this.setState((state) => ({
-            ...state, uuid: data.uuid
+            ...state, session_token: session_token
         }))
-        api.post(`/question?uuid=${data.uuid}`, JSON.stringify(data.uuid))
-            .then(res => {
-                const question = res.data.question;
-                const uuid = data.uuid;
-                const quid = res.data.quid;
-                this.setState({ question, uuid, quid});
-        })
+        // api.post(`/question?uuid=${data.uuid}`, JSON.stringify(data.uuid))
+        //     .then(res => {
+        //         const question = res.data.question;
+        //         const uuid = data.uuid;
+        //         const quid = res.data.quid;
+        //         this.setState({ question, uuid, quid});
+        // })
     }
 
     handleAnswerSubmit() {
         const data = {
-            uuid: this.state.uuid,
-            quid: this.state.quid,
-            answer_user: this.state.answer_user
+            quid: window.localStorage.getItem('quid'),
+            user_answer: this.state.user_answer
         }
-        api.post(`/answer?uuid=${data.uuid}&quid=${data.quid}&second_language_phrase_answer=${data.answer_user}`, JSON.stringify(data))
+        const session_token = window.localStorage.getItem('session_token')
+        api.patch('/answer', data, { headers: { session_token: `${session_token}`}})
             .then((response) => {
-                const answer = response.data.answer
-                const is_equal = response.data.is_equal
-                const score = response.data.score
-                const differences = response.data.differences
-                this.setState({ answer, is_equal, score, differences });
+                console.log(response);
+                // const answer = response.data.answer
+                // const is_equal = response.data.is_equal
+                // const score = response.data.score
+                // const differences = response.data.differences
+                // this.setState({ answer, is_equal, score, differences });
             })
             .catch((error) => {
                 console.log(error);
@@ -54,11 +55,11 @@ class Question extends React.Component {
     }
 
     handleInputChange(event) {
-        this.setState({answer_user: event.target.value});
+        this.setState({user_answer: event.target.value});
     }
 
     renderQuestion() {
-        const { question } = this.state
+        const question = window.localStorage.getItem('question');
         return (
             <div className="vh-100">
                 <div className="centered-element">
@@ -83,7 +84,7 @@ class Question extends React.Component {
     }
 
     renderAnswer() {
-        const { question, answer, answer_user, score, is_equal } = this.state
+        const { question, answer, user_answer, score, is_equal } = this.state
         return (
             <div className="vh-100">
                 <div className="centered-element w-100">
@@ -95,7 +96,7 @@ class Question extends React.Component {
                         </tr>
                         <tr>
                             <td className="table-header ">Answer:</td>
-                            <td className="table-text table-text_answer">{answer_user}</td>
+                            <td className="table-text table-text_answer">{user_answer}</td>
                         </tr>
                         <tr>
                             <td className="table-header">Correct answer:</td>
