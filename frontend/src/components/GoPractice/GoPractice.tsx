@@ -53,7 +53,11 @@ const GoPractice = (): JSX.Element => {
             second_language: secondLanguage,
             level: level
         }
-        const session_token = window.localStorage.getItem('session_token')
+        window.localStorage.setItem('firstLanguage', firstLanguage)
+        window.localStorage.setItem('secondLanguage', secondLanguage)
+        window.localStorage.setItem('level', level)
+        // const session_token = window.localStorage.getItem('session_token')
+        const session_token = '40b39433-f0a5-4d89-abf2-7649fdcf2e7b'
         api.post('/question', questionConfig, { headers: { session_token: `${session_token}` } })
             .then((response: any) => {
                 console.log(response.data);

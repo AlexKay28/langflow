@@ -24,29 +24,45 @@ class Question extends React.Component {
         this.setState((state) => ({
             ...state, session_token: session_token
         }))
-        // api.post(`/question?uuid=${data.uuid}`, JSON.stringify(data.uuid))
-        //     .then(res => {
-        //         const question = res.data.question;
-        //         const uuid = data.uuid;
-        //         const quid = res.data.quid;
-        //         this.setState({ question, uuid, quid});
-        // })
     }
 
-    handleAnswerSubmit() {
+    handleQuestionSubmit() {
+        // const session_token = window.localStorage.getItem('session_token')
+        const session_token = '40b39433-f0a5-4d89-abf2-7649fdcf2e7b'
+        const questionConfig = {
+            first_language: window.localStorage.getItem('firstLanguage'),
+            second_language: window.localStorage.getItem('secondLanguage'),
+            level: window.localStorage.getItem('level'),
+        }
+        api.post('/question', questionConfig, { headers: { session_token: `${session_token}` } })
+            .then((response) => {
+                console.log(response.data);
+                const { question, quid } = response.data
+                window.localStorage.setItem('question', question)
+                window.localStorage.setItem('quid', quid)
+            })
+            .catch((error) => {
+                console.log(error);
+            });
+        this.setState({ isAnswer: false});
+    }
+
+        async handleAnswerSubmit() {
         const data = {
             quid: window.localStorage.getItem('quid'),
             user_answer: this.state.user_answer
         }
-        const session_token = window.localStorage.getItem('session_token')
+        // const session_token = window.localStorage.getItem('session_token')
+        const session_token = '40b39433-f0a5-4d89-abf2-7649fdcf2e7b'
         api.patch('/answer', data, { headers: { session_token: `${session_token}`}})
             .then((response) => {
-                console.log(response);
-                // const answer = response.data.answer
-                // const is_equal = response.data.is_equal
-                // const score = response.data.score
-                // const differences = response.data.differences
-                // this.setState({ answer, is_equal, score, differences });
+                const question = response.data.question
+                const answer = response.data.answer
+                const answer_user = response.data.answer_user
+                const is_equal = response.data.is_equal
+                const score = response.data.score
+                const differences = response.data.differences
+                this.setState({ question, answer, answer_user, is_equal, score, differences });
             })
             .catch((error) => {
                 console.log(error);
@@ -113,7 +129,7 @@ class Question extends React.Component {
                         </tbody>
                     </table>
                     <form>
-                        <button className="btn btn-success btn-lg" value="Next"  id="next_button" onClick={this.handleAnswerSubmit}>Next</button>
+                        <button className="btn btn-success btn-lg" value="Next"  id="next_button" onClick={this.handleQuestionSubmit}>Next</button>
                     </form>
                 </div>
             </div>
