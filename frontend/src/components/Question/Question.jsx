@@ -36,7 +36,6 @@ class Question extends React.Component {
         }
         api.post('/question', questionConfig, { headers: { session_token: `${session_token}` } })
             .then((response) => {
-                console.log(response.data);
                 const { question, quid } = response.data
                 window.localStorage.setItem('question', question)
                 window.localStorage.setItem('quid', quid)
