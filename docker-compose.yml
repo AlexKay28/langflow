@@ -37,7 +37,7 @@ services:
         POSTGRES_USER: postgres
         POSTGRES_PASSWORD: 123456
       volumes:
-         - ./backend/data/postgresql:/var/lib/postgres/data
+         - ./data/postgresql:/var/lib/postgresql/data
       ports:
         - "5432:5432"
       networks:
@@ -51,7 +51,7 @@ services:
         PGADMIN_DEFAULT_EMAIL: langflow@russia.win
         PGADMIN_DEFAULT_PASSWORD: 123456
       volumes:
-         - ./backend/data/pgadmin:/var/lib/pgadmin/data
+         - ./data/pgadmin:/var/lib/pgadmin/data
       ports:
         - "${PGADMIN_PORT:-5050}:80"
       depends_on:
@@ -63,7 +63,3 @@ services:
 networks:
   postgres-net:
     driver: bridge
-
-volumes:
-    postgres:
-    pgadmin:

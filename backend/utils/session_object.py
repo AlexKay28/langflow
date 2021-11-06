@@ -94,6 +94,10 @@ class SessionController:
         """
         Smart question selection
         """
+        # table_df = pd.read_csv("tmp/phrases.csv")
+        # table_df["level"] = table_df["level"].astype("int")
+        # update_data_csv(table_df)
+
         if level > 0:
             phrases_id = (
                 db.session.query(Phrase.id).filter(Phrase.level == level).distinct()
@@ -154,6 +158,7 @@ class SessionController:
         """
         Get particular question of particular user
         """
+
         row = (
             db.session.query(Action)
             .filter(and_(Action.quid == quid, Action.uuid == uuid))

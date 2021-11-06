@@ -8,10 +8,10 @@ def test_answer_uuid(client, session, ask_valid_uuid):
         rv = c.patch(
             "/answer",
             headers={
-                "session_token": "47a60ef9e7337bf0",
+                "session_token": "3f2c077d1a8f731d",
             },
             json={
-                "question_token": "09a6d97aee2f097e",
+                "question_token": "693e2c6e3466654a",
                 "user_answer": "this is answer on second language",
             },
         )

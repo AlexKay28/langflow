@@ -2,12 +2,12 @@ import json
 import pytest
 
 
-def test_answer_uuid(client, session, ask_valid_uuid):
+def test_results_uuid(client, session, ask_valid_uuid):
     with client.test_client() as c:
         rv = c.get(
             "/results",
             headers={
-                "session_token": "8fcb4a81047dbeff",
+                "session_token": "3f2c077d1a8f731d",
             },
             json={},
         )

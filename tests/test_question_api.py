@@ -7,7 +7,7 @@ def test_question_uuid(client, session, ask_valid_uuid):
         rv = c.post(
             "/question",
             headers={
-                "session_token": "8fcb4a81047dbeff",
+                "session_token": "37367bab4b0890b2",
             },
             json={
                 "first_language": "english",
