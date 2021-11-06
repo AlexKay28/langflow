@@ -8,14 +8,15 @@ from dbase import db
 class Action(db.Model):
     __tablename__ = "actions"
 
-    uuid = db.Column(UUID(as_uuid=True), db.ForeignKey("anon_users.uuid"), unique=True)
+    uuid = db.Column(UUID(as_uuid=True), db.ForeignKey("anon_users.uuid"))
     quid = db.Column(UUID(as_uuid=True), primary_key=True)
-    phrase_id = db.Column(db.Integer, db.ForeignKey("phrases.id"), nullable=False)
-    level = db.Column(db.Integer, unique=False)
-    first_language = db.Column(db.String(16), unique=False, nullable=False)
-    second_language = db.Column(db.String(16), unique=False, nullable=False)
-    user_answer = db.Column(db.String(256), unique=False, nullable=False)
-    score = db.Column(db.Float, unique=False)
+    quid_token = db.Column(db.String(16), unique=True, nullable=False)
+    phrase_id = db.Column(db.Integer, db.ForeignKey("phrases.id"))
+    level = db.Column(db.Integer)
+    first_language = db.Column(db.String(16), nullable=False)
+    second_language = db.Column(db.String(16), nullable=False)
+    user_answer = db.Column(db.String(256), nullable=True)
+    score = db.Column(db.Float)
     action_date = db.Column(
         db.DateTime(timezone=True), default=datetime.datetime.utcnow
     )
@@ -24,6 +25,7 @@ class Action(db.Model):
         self,
         uuid,
         quid,
+        quid_token,
         phrase_id,
         level,
         first_language,
@@ -33,6 +35,7 @@ class Action(db.Model):
     ):
         self.uuid = uuid
         self.quid = quid
+        self.quid_token = quid_token
         self.phrase_id = phrase_id
         self.level = level
         self.first_language = first_language

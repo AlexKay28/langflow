@@ -1,17 +1,20 @@
 version: '3.2'
 services:
-    backend:
-        build:
-          context: ./backend
-          dockerfile: Dockerfile
-        image: langflow_back:v0.1
-        container_name: langflow_application_back
-        volumes:
-          - ./backend:/backend
-        ports:
-          - 6767:6767
-        network_mode: host
-        command: python app.py
+    # backend:
+    #     build:
+    #       context: ./backend
+    #       dockerfile: Dockerfile
+    #     image: langflow_back:v0.1
+    #     container_name: langflow_application_back
+    #     depends_on:
+    #       - postgres
+    #     volumes:
+    #       - ./backend:/backend
+    #     ports:
+    #       - 6767:6767
+    #     network_mode: host
+    #     command: python app.py
+    #     restart: unless-stopped
 
     frontend:
         build:
@@ -25,6 +28,7 @@ services:
           - 3000:3000
         network_mode: host
         command: npm start
+        restart: unless-stopped
 
     postgres:
       image: postgres

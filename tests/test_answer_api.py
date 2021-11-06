@@ -4,20 +4,17 @@ import pytest
 
 def test_answer_uuid(client, session, ask_valid_uuid):
     with client.test_client() as c:
-        session_token = next(iter(session.db.users))
-        quid = next(iter(session.db.get_user(session_token).questions))
         # send answer
         rv = c.patch(
             "/answer",
             headers={
-                "session_token": session_token,
+                "session_token": "47a60ef9e7337bf0",
             },
             json={
-                "quid": quid,
+                "question_token": "09a6d97aee2f097e",
                 "user_answer": "this is answer on second language",
             },
         )
         json_data = rv.get_json()
-        print(json_data)
-        quid = json_data["quid"]
-        assert ask_valid_uuid(quid)
+        score = json_data["score"]
+        assert isinstance(score, float)

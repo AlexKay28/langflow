@@ -1,4 +1,5 @@
 import json
+import traceback
 
 from . import api, request, jsonify, session
 
@@ -20,5 +21,10 @@ def login_api():
             {"session_token": session_token_generated, "status": user_existance}
         )
     except Exception as e:
-        print(e)
-        return jsonify({"status": 400, "message": f"Bad request. {e}"})
+        return jsonify(
+            {
+                "status": 500,
+                "message": f"Server internal error. {e}",
+                "traceback": f"{traceback.format_exc()}",
+            }
+        )

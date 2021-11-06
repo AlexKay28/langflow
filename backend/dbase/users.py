@@ -9,7 +9,7 @@ class UserAuthorized(db.Model):
     __tablename__ = "authorized_users"
 
     uuid = db.Column(UUID(as_uuid=True), primary_key=True)
-    session_token = db.Column(UUID(as_uuid=True))
+    session_token = db.Column(db.String(16), unique=True)
     username = db.Column(db.String(32), unique=True, nullable=False)
     password = db.Column(db.String(32), unique=False, nullable=False)
     email = db.Column(db.String(32), unique=True, nullable=False)
@@ -33,7 +33,7 @@ class UserAnon(db.Model):
     __tablename__ = "anon_users"
 
     uuid = db.Column(UUID(as_uuid=True), primary_key=True)
-    session_token = db.Column(UUID(as_uuid=True))
+    session_token = db.Column(db.String(16), unique=True)
     created_date = db.Column(
         db.DateTime(timezone=True), default=datetime.datetime.utcnow
     )
