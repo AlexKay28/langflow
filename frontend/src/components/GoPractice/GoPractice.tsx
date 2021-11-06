@@ -56,14 +56,13 @@ const GoPractice = (): JSX.Element => {
         window.localStorage.setItem('firstLanguage', firstLanguage)
         window.localStorage.setItem('secondLanguage', secondLanguage)
         window.localStorage.setItem('level', level)
-        // const session_token = window.localStorage.getItem('session_token')
-        const session_token = '40b39433-f0a5-4d89-abf2-7649fdcf2e7b'
+        const session_token = window.localStorage.getItem('session_token')
         api.post('/question', questionConfig, { headers: { session_token: `${session_token}` } })
             .then((response: any) => {
                 console.log(response.data);
-                const { question, quid } = response.data
+                const { question, question_token } = response.data
                 window.localStorage.setItem('question', question)
-                window.localStorage.setItem('quid', quid)
+                window.localStorage.setItem('question_token', question_token)
             })
             .catch((error) => {
                 console.log(error);
@@ -104,7 +103,6 @@ const GoPractice = (): JSX.Element => {
                 open={openFirstLanguage}
                 onClose={handleCloseFirstLanguage}
                 onOpen={handleOpenFirstLanguage}
-                // value={firstLanguage}
                 label="First language"
                 onChange={handleChangeFirstLanguage}
                 defaultValue={'english'}
@@ -123,7 +121,6 @@ const GoPractice = (): JSX.Element => {
                 open={openSecondLanguage}
                 onClose={handleCloseSecondLanguage}
                 onOpen={handleOpenSecondLanguage}
-                // value={secondLanguage}
                 label="Second language"
                 onChange={handleChangeSecondLanguage}
                 defaultValue={'russian'}

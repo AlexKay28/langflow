@@ -8,7 +8,7 @@ class Question extends React.Component {
     
         this.state = {
             uuid: '',
-            quid: '',
+            question_token: '',
             answer: '',
             user_answer: '',
             is_equal: '',
@@ -27,8 +27,7 @@ class Question extends React.Component {
     }
 
     handleQuestionSubmit() {
-        // const session_token = window.localStorage.getItem('session_token')
-        const session_token = '40b39433-f0a5-4d89-abf2-7649fdcf2e7b'
+        const session_token = window.localStorage.getItem('session_token')
         const questionConfig = {
             first_language: window.localStorage.getItem('firstLanguage'),
             second_language: window.localStorage.getItem('secondLanguage'),
@@ -36,9 +35,9 @@ class Question extends React.Component {
         }
         api.post('/question', questionConfig, { headers: { session_token: `${session_token}` } })
             .then((response) => {
-                const { question, quid } = response.data
+                const { question, question_token } = response.data
                 window.localStorage.setItem('question', question)
-                window.localStorage.setItem('quid', quid)
+                window.localStorage.setItem('question_token', question_token)
             })
             .catch((error) => {
                 console.log(error);
@@ -48,11 +47,10 @@ class Question extends React.Component {
 
         async handleAnswerSubmit() {
         const data = {
-            quid: window.localStorage.getItem('quid'),
+            question_token: window.localStorage.getItem('question_token'),
             user_answer: this.state.user_answer
         }
-        // const session_token = window.localStorage.getItem('session_token')
-        const session_token = '40b39433-f0a5-4d89-abf2-7649fdcf2e7b'
+        const session_token = window.localStorage.getItem('session_token')
         api.patch('/answer', data, { headers: { session_token: `${session_token}`}})
             .then((response) => {
                 const question = response.data.question
