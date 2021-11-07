@@ -1,4 +1,5 @@
 import json
+import traceback
 
 from . import api, request, jsonify, session
 
@@ -11,28 +12,35 @@ def question_api():
         uuid,
     """
     try:
-        # auth
+        # auth token
         session_token = request.headers.get("session_token")
-
+        # request body
         req = request.get_json()
         first_language = req["first_language"]
         second_language = req["second_language"]
         level = int(req["level"])
 
         # get uuid using session_token
-        uuid = session_token
+        uuid = session.get_user_uuid(session_token)
 
         (
-            quid,
+            question_token,
             first_language_phrase,
             second_language_phrase,
         ) = session.generate_phrase_pair(uuid, first_language, second_language, level)
+
         return jsonify(
             {
-                "quid": quid,
+                "question_token": question_token,
                 "question": first_language_phrase,
                 "answer": second_language_phrase,
             }
         )
     except Exception as e:
-        return jsonify({"status": 400, "message": f"Bad request. {e}"})
+        return jsonify(
+            {
+                "status": 500,
+                "message": f"Server internal error. {e}",
+                "traceback": f"{traceback.format_exc()}",
+            }
+        )

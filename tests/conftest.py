@@ -6,6 +6,8 @@ from flask import Flask, jsonify, request
 sys.path.append("../backend")
 
 from api import api
+from dbase import db
+
 from utils.session_object import SessionController
 
 
@@ -13,6 +15,12 @@ from utils.session_object import SessionController
 def client():
     app = Flask(__name__)
     app.register_blueprint(api)
+
+    app.config[
+        "SQLALCHEMY_DATABASE_URI"
+    ] = "postgresql://postgres:123456@localhost:5432/langflow"
+    app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+    db.init_app(app)
     return app
 
 

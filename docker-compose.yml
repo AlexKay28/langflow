@@ -6,12 +6,15 @@ services:
           dockerfile: Dockerfile
         image: langflow_back:v0.1
         container_name: langflow_application_back
+        depends_on:
+          - postgres
         volumes:
           - ./backend:/backend
         ports:
           - 6767:6767
         network_mode: host
         command: python app.py
+        restart: unless-stopped
 
     frontend:
         build:
@@ -25,3 +28,38 @@ services:
           - 3000:3000
         network_mode: host
         command: npm start
+        restart: unless-stopped
+
+    postgres:
+      image: postgres
+      container_name: postgres
+      environment:
+        POSTGRES_USER: postgres
+        POSTGRES_PASSWORD: 123456
+      volumes:
+         - ./data/postgresql:/var/lib/postgresql/data
+      ports:
+        - "5432:5432"
+      networks:
+        - postgres-net
+      restart: unless-stopped
+
+    pgadmin:
+      image: dpage/pgadmin4
+      container_name: pgadmin
+      environment:
+        PGADMIN_DEFAULT_EMAIL: langflow@russia.win
+        PGADMIN_DEFAULT_PASSWORD: 123456
+      volumes:
+         - ./data/pgadmin:/var/lib/pgadmin/data
+      ports:
+        - "${PGADMIN_PORT:-5050}:80"
+      depends_on:
+        - postgres
+      networks:
+        - postgres-net
+      restart: unless-stopped
+
+networks:
+  postgres-net:
+    driver: bridge
