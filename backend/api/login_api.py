@@ -1,4 +1,5 @@
 import json
+import traceback
 
 from . import api, request, jsonify, session
 
@@ -13,21 +14,17 @@ def login_api():
         username = req["username"]
         password = req["password"]
         is_anon = req["is_anon"]
-
-        if not is_anon:
-            # user autorization to server.
-            session_token_generated, user_existance = session.create_user(
-                username, password
-            )
-        else:
-            # user works anonymously
-            session_token_generated, user_existance = session.create_user(
-                username, password
-            )
-
+        session_token_generated, user_existance = session.activate_session_token(
+            username, password, is_anon
+        )
         return jsonify(
             {"session_token": session_token_generated, "status": user_existance}
         )
     except Exception as e:
-        print(e)
-        return jsonify({"status": 400, "message": f"Bad request. {e}"})
+        return jsonify(
+            {
+                "status": 500,
+                "message": f"Server internal error. {e}",
+                "traceback": f"{traceback.format_exc()}",
+            }
+        )

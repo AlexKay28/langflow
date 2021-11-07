@@ -1,4 +1,5 @@
 import json
+import traceback
 
 from utils.tips import show_differences
 from utils.comparing import compare_answers
@@ -14,48 +15,48 @@ def answer_api():
         uuid, qid, second_language_phrase_answer
     """
     try:
-        # auth
+        # auth token
         session_token = request.headers.get("session_token")
-
+        # request body
         req = request.get_json()
-        quid = req["quid"]
+        question_token = req["question_token"]
         user_answer = req["user_answer"]
 
         # get uuid using session_token
-        uuid = session_token
+        uuid = session.get_user_uuid(session_token)
+        quid = session.get_question_quid(question_token)
 
-        (
-            first_language,
-            first_language_phrase,
-            second_language,
-            second_language_phrase,
-        ) = session.get_user_phrases(uuid, quid)
+        # get info from db about users question
+        flang, flang_phrase, slang, slang_phrase = session.get_user_phrases(uuid, quid)
 
         # apply models to compare answer and get inference
-        comparing_result = compare_answers(
-            second_language, second_language_phrase, user_answer
-        )
+        comparing_result = compare_answers(slang, slang_phrase, user_answer)
         is_equal = comparing_result["is_equal"]
-        equality_rate = comparing_result["equality_rate"]
+        score = comparing_result["equality_rate"]
 
         # records users success/fail in his metadata
-        session.record_users_result(uuid, quid, equality_rate)
+        session.record_users_result(uuid, quid, user_answer, score)
 
         # generate tips for user
         differences = ""
         if not is_equal:
-            differences = show_differences(second_language_phrase, user_answer)
+            differences = show_differences(slang_phrase, user_answer)
 
         return jsonify(
             {
-                "quid": quid,
-                "question": first_language_phrase,
-                "answer": second_language_phrase,
+                "question": flang_phrase,
+                "answer": slang_phrase,
                 "answer_user": user_answer,
                 "is_equal": is_equal,
-                "score": equality_rate,
+                "score": score,
                 "differences": differences,
             }
         )
     except Exception as e:
-        return jsonify({"status": 500, "message": f"Internal Server Error. {e}"})
+        return jsonify(
+            {
+                "status": 500,
+                "message": f"Server internal error. {e}",
+                "traceback": f"{traceback.format_exc()}",
+            }
+        )

@@ -4,12 +4,10 @@ import pytest
 
 def test_question_uuid(client, session, ask_valid_uuid):
     with client.test_client() as c:
-
-        session_token = next(iter(session.db.users))
         rv = c.post(
             "/question",
             headers={
-                "session_token": session_token,
+                "session_token": "37367bab4b0890b2",
             },
             json={
                 "first_language": "english",
@@ -18,5 +16,5 @@ def test_question_uuid(client, session, ask_valid_uuid):
             },
         )
         json_data = rv.get_json()
-        quid = json_data["quid"]
-        assert ask_valid_uuid(quid)
+        question_token = json_data["question_token"]
+        assert not ask_valid_uuid(question_token) and len(question_token) == 16
