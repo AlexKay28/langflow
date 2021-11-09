@@ -1,11 +1,11 @@
 import React from 'react'
-import Link from '@material-ui/core/Link'
 import { makeStyles } from "@material-ui/styles"
 import InputLabel from '@material-ui/core/InputLabel'
 import MenuItem from '@material-ui/core/MenuItem'
 import FormControl from '@material-ui/core/FormControl'
 import Select, { SelectChangeEvent } from '@material-ui/core/Select'
 import api from "../../utils/api"
+import { Link } from "react-router-dom";
 
 export const useStyles = makeStyles(() => ({
 	button: {
@@ -36,37 +36,21 @@ const GoPractice = (): JSX.Element => {
 
     const handleClick = () => {
         const loginData = {
-            username: '',
-            password: '',
+            username: 'user',
+            password: 'pass',
             is_anon: true
         }
         api.post('/login', loginData)
         .then((response: any) => {
             const { session_token } = response.data
             window.localStorage.setItem('session_token', session_token)
+            window.localStorage.setItem('firstLanguage', firstLanguage)
+            window.localStorage.setItem('secondLanguage', secondLanguage)
+            window.localStorage.setItem('level', level)
         })
         .catch((error) => {
             console.log(error);
         });
-        const questionConfig = {
-            first_language: firstLanguage,
-            second_language: secondLanguage,
-            level: level
-        }
-        window.localStorage.setItem('firstLanguage', firstLanguage)
-        window.localStorage.setItem('secondLanguage', secondLanguage)
-        window.localStorage.setItem('level', level)
-        const session_token = window.localStorage.getItem('session_token')
-        api.post('/question', questionConfig, { headers: { session_token: `${session_token}` } })
-            .then((response: any) => {
-                console.log(response.data);
-                const { question, question_token } = response.data
-                window.localStorage.setItem('question', question)
-                window.localStorage.setItem('question_token', question_token)
-            })
-            .catch((error) => {
-                console.log(error);
-            });
     };
 
     const handleCloseFirstLanguage = () => {
@@ -148,7 +132,7 @@ const GoPractice = (): JSX.Element => {
                 <MenuItem value={2}>2</MenuItem>
                 </Select>
             </FormControl>
-            <Link href="/question" style={{ fontSize: '36px' }} color="inherit" underline="none" className="btn btn-success" onClick={handleClick}>Go practice!</Link>
+            <Link to='/question' style={{ fontSize: '36px' }} color="inherit" className="btn btn-success" onClick={handleClick}>Go practice!</Link>
         </div>
     );
 }
