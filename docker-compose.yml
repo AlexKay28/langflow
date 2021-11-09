@@ -14,7 +14,6 @@ services:
           - 6767:6767
         network_mode: host
         command: python app.py
-        restart: unless-stopped
 
     frontend:
         build:

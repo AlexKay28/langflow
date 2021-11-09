@@ -9,7 +9,8 @@ from sqlalchemy import and_, or_, not_
 from dbase import db
 from dbase.users import UserAuthorized, UserAnon
 from dbase.actions import Action
-from dbase.phrases import Phrase, update_data_csv
+from dbase.phrases import Phrase
+from dbase.database_connector import DatabaseConnector
 
 N_MAX_USERS = 25
 
@@ -94,9 +95,6 @@ class SessionController:
         """
         Smart question selection
         """
-        # table_df = pd.read_csv("tmp/phrases.csv")
-        # table_df["level"] = table_df["level"].astype("int")
-        # update_data_csv(table_df)
 
         if level > 0:
             phrases_id = (
@@ -214,3 +212,23 @@ class SessionController:
             "average_score": average_score,
             "Inference": "Study more, lazy boy!",
         }
+
+    def upload_phrases_to_db(self, df: pd.DataFrame):
+        """
+        Upload provided data to database replacing the previous one
+        """
+        # check needed columns
+        assert all(
+            [
+                col in df.columns
+                for col in ["level", "english", "russian", "ukrainian", "french"]
+            ]
+        )
+
+        # upload data to base
+        dbconnector = DatabaseConnector(
+            "langflow", "postgres", 123456, "localhost", 5432
+        )
+        dbconnector.upload_df_table(df, "public", "phrases", if_exists="replace")
+
+        return 0

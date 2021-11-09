@@ -1,23 +1,6 @@
 from dbase import db
 
 
-def update_data_csv(table):
-    db.session.query(Phrase).delete()
-
-    for id, row in table.iterrows():
-        phrase = Phrase(
-            id=id,
-            level=row["level"],
-            english=row["english"],
-            french=row["french"],
-            russian=row["russian"],
-            ukrainian=row["ukrainian"],
-        )
-        db.session.add(phrase)
-        db.session.commit()
-    return 1
-
-
 class Phrase(db.Model):
     __tablename__ = "phrases"
 
