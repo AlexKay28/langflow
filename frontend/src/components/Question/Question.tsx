@@ -15,25 +15,20 @@ const Question = () => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
   useEffect(() => {
-    setTimeout(() => {
+    setTimeout(async () => {
       const questionConfig = {
         first_language: window.localStorage.getItem('firstLanguage'),
         second_language: window.localStorage.getItem('secondLanguage'),
         level: window.localStorage.getItem('level'),
       }
       const session_token = window.localStorage.getItem('session_token')
-      api.post('/question', questionConfig, { headers: { session_token: `${session_token}` } })
-        .then((response: any) => {
-          setQuestion(response.data.question)
-          setQuestionToken(response.data.question_token)
-        })
-        .catch((error) => {
-            console.log(error);
-        });
-    }, 50)
+      const response: any = await api.post('/question', questionConfig, { headers: { session_token: `${session_token}` } })
+      setQuestion(response.data.question)
+      setQuestionToken(response.data.question_token)
+    }, 100)
   }, [])
 
-  const handleAnswerSubmit = () => {  
+  const handleAnswerSubmit = async () => {  
     const data = {
         question_token: question_token,
         user_answer: user_answer

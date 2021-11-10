@@ -34,23 +34,18 @@ const GoPractice = (): JSX.Element => {
         setLevel(event.target.value);
     };
 
-    const handleClick = () => {
+    const handleClick = async () => {
         const loginData = {
             username: 'user',
             password: 'pass',
             is_anon: true
         }
-        api.post('/login', loginData)
-        .then((response: any) => {
-            const { session_token } = response.data
-            window.localStorage.setItem('session_token', session_token)
-            window.localStorage.setItem('firstLanguage', firstLanguage)
-            window.localStorage.setItem('secondLanguage', secondLanguage)
-            window.localStorage.setItem('level', level)
-        })
-        .catch((error) => {
-            console.log(error);
-        });
+        const response: any = await api.post('/login', loginData)
+        const { session_token } = response.data
+        window.localStorage.setItem('session_token', session_token)
+        window.localStorage.setItem('firstLanguage', firstLanguage)
+        window.localStorage.setItem('secondLanguage', secondLanguage)
+        window.localStorage.setItem('level', level)
     };
 
     const handleCloseFirstLanguage = () => {
