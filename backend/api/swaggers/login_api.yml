@@ -5,7 +5,9 @@ the user who whorks anonimously
 ---
 description: Client side interaction with server
 consumes:
-  - application/json
+- "application/json"
+produces:
+- "application/json"
 parameters:
   - name: body
     in: body
