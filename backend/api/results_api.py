@@ -1,25 +1,38 @@
 import json
 import traceback
 
+from flask import request, jsonify
+from flasgger.utils import swag_from
+
 from . import api, request, jsonify, session
 
 
 @api.route("/results", methods=["GET"])
+@swag_from("swaggers/results_api.yml")
 def results_api():
-    """
-    Final statistics about users progress while session
-    Endpoint gets the keys:
-        uuid
-    """
     try:
         # auth token
         session_token = request.headers.get("session_token")
 
         # get uuid using session_token
         uuid = session.get_user_uuid(session_token)
+        (
+            slangs_counts,
+            answered_questions_number,
+            unanswered_questions_number,
+            average_score,
+            message,
+        ) = session.get_user_analysis(uuid)
 
-        analysis = session.get_user_analysis(uuid)
-        return jsonify(analysis)
+        return jsonify(
+            {
+                "target_languages_counts": slangs_counts,
+                "answered_questions_number": answered_questions_number,
+                "unanswered_questions_number": unanswered_questions_number,
+                "average_score": average_score,
+                "inference": message,
+            }
+        )
     except Exception as e:
         return jsonify(
             {

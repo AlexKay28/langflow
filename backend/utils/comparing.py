@@ -12,10 +12,15 @@ CORRECTNESS_RATE = 0.98
 PATH_TO_MODELS = "language_models/"
 
 
-def load_language_model(model_name, extension="gz"):
+def load_language_model(model_name: str, extension: str = "gz"):
     """
     Models are stored as .bit.tar.gz
     Fore session working they are needed to be extracted
+
+    :param model_name: name of model to upload for similarity comparing
+    :param extension: the extenstion of the binary model file
+
+    :return: loaded fasttext model
     """
     model_name_ext = f"{model_name}5.bin"
     archive_path = os.path.join(PATH_TO_MODELS, f"{model_name_ext}.{extension}")
@@ -33,6 +38,10 @@ def normalize_form_of_answer(answer: str) -> str:
     """
     Normalize string to the single form which are
     equal in any case of writing style.
+
+    :param answer: answer of user needed to normalize
+
+    :return: normalized answer with replaced symbols
     """
     answer = answer.lower().strip()
 
@@ -45,15 +54,27 @@ def normalize_form_of_answer(answer: str) -> str:
 def tokenize_answer(answer: str) -> List:
     """
     Tokenize sentence
+
+    :param answer: the answer to tokenize
+
+    :return: the list of tokens
     """
     tokens = answer.split() if len(answer) > 0 else []
     return tokens
 
 
-def get_phrase_vector(language_model, phrase_tokens, approach=None):
+def get_phrase_vector(
+    language_model, phrase_tokens: List, approach: str = None
+) -> np.ndarray:
     """
     Get phrase vector using language model which provides each
     containing token embedding
+
+    :param language_model: defined language model for similarity processing
+    :param phrase_tokens: the list of tokens which is going to be norlmalized
+    :param approach: the way how to aggreagate tokens vectors
+
+    :return: the numpy array of aggregated vector
     """
     if not approach:
         phrase_vec = language_model.get_sentence_vector(" ".join(phrase_tokens))
@@ -63,9 +84,15 @@ def get_phrase_vector(language_model, phrase_tokens, approach=None):
     return phrase_vec
 
 
-def get_similarity(vec1, vec2, metric="cosine"):
+def get_similarity(vec1: np.ndarray, vec2: np.ndarray, metric: str = "cosine") -> float:
     """
     Calculate semantic closeness using choosed metric function
+
+    :param vec1: the vector of the first phrase
+    :param vec2: the vector of the second phrase
+    :param metric: the metric how to calculate vectors closeness
+
+    :return: the distance between two provided n-dim vectors
     """
     if metric == "cosine":
         return 1 - cosine(vec1, vec2)
@@ -75,6 +102,11 @@ def get_similarity(vec1, vec2, metric="cosine"):
 def get_equality_rate(language_model, real_answer: str, user_answer: str) -> float:
     """
     Get equality_rate between users
+
+    :param real_answer: the answer from the base which is ideal for question
+    :param user_answer: the answer from user which should be compared with real_answer
+
+    :return: the distance between two phrases which is vectorized
     """
     if not user_answer:
         return 0.0
@@ -90,7 +122,12 @@ def get_equality_rate(language_model, real_answer: str, user_answer: str) -> flo
 def compare_answers(language, real_answer: str, user_answer: str) -> bool:
     """
     This function compares answer and makes an inference
-    about of equality
+    about of equality. The similarity threshold is defined by system
+
+    :param real_answer: the answer from the base which is ideal for question
+    :param user_answer: the answer from user which should be compared with real_answer
+
+    :return: calculated inference about answer correctness
     """
     language_model = load_language_model(language)
     real_answer = normalize_form_of_answer(real_answer)

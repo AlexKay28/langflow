@@ -15,9 +15,13 @@ from dbase.database_connector import DatabaseConnector
 N_MAX_USERS = 25
 
 
-def generate_random_token(type):
+def generate_random_token(type: str) -> str:
     """
     Generate unique encoded string
+
+    :param type: the encoding type which should be applied
+
+    :return: the generated encoding string
     """
     if type == "uuid4":
         return uuid.uuid4()
@@ -31,14 +35,21 @@ class SessionController:
     """
     Session object which contains session parameters
     for correct question formatting and question selection
+
+    :param n_jobs: the number of simultaneously used cores for processing. If the
+     value is defined as -1 then all available cpu cores are used.
     """
 
-    def __init__(self):
-        pass
+    def __init__(self, n_jobs: int = -1):
+        self.n_jobs = n_jobs
 
-    def is_user(self, uuid: str):
+    def is_user(self, uuid: str) -> bool:
         """
         Check particular user existance
+
+        :param uuid: the string with uuid to look for in db
+
+        :return: boolean value was user created or not
         """
         return uuid in self.db.users_uuid_list
 
@@ -48,6 +59,12 @@ class SessionController:
     ) -> Tuple[str, bool]:
         """
         Activate user session
+
+        :param username: provided username.
+        :param password: provided password.
+        :param is_anon: is user work as anonimous user or authorized.
+
+        :return: tuple of values - generated token and generation status check (str, bool)
         """
 
         if is_anon:
@@ -67,9 +84,13 @@ class SessionController:
         return session_token_generated, True
 
     @staticmethod
-    def get_user_uuid(session_token):
+    def get_user_uuid(session_token: str) -> str:
         """
         Get user unique id (uuid) from users table.
+
+        :param session_token: active session token from server side.
+
+        :return: uuid of user from base.
         """
         uuid = (
             db.session.query(UserAnon.uuid)
@@ -79,9 +100,13 @@ class SessionController:
         return str(uuid)
 
     @staticmethod
-    def get_question_quid(quid_token):
+    def get_question_quid(quid_token: str) -> str:
         """
         Get user unique id (uuid) from users table.
+
+        :param quid_token: the question token server side
+
+        :return: quid from base
         """
         quid = (
             db.session.query(Action.quid)
@@ -91,9 +116,18 @@ class SessionController:
         return str(quid)
 
     @staticmethod
-    def select_question(uuid, first_language, second_language, level):
+    def select_question(
+        uuid: str, first_language: str, second_language: str, level: int
+    ) -> Tuple[str, str, str]:
         """
         Smart question selection
+
+        :param uuid: the uuid of user which asks to get the question
+        :param first_language: the language which is known by user
+        :param second_language: the language which is learning by user
+        :param level: the level which defined the hardness of the asked phrase
+
+        :return: tuple which consts of question id, and phrase on two languages
         """
 
         if level > 0:
@@ -125,6 +159,13 @@ class SessionController:
     ) -> Tuple[str, str]:
         """
         Choose pair of phrases randomly
+
+        :param uuid: the uuid of user which asks to get the question
+        :param first_language: the language which is known by user
+        :param second_language: the language which is learning by user
+        :param level: the level which defined the hardness of the asked phrase
+
+        :return: the tuple of three values with question id and phrase on two languages
         """
         # smart selection
         phrase_id, flang, slang = self.select_question(
@@ -152,9 +193,14 @@ class SessionController:
 
         return quid_token_generated, flang, slang
 
-    def get_user_phrases(self, uuid: str, quid: str):
+    def get_user_phrases(self, uuid: str, quid: str) -> Tuple[str, str, str, str]:
         """
         Get particular question of particular user
+
+        :param uuid: the user id for existed pair selection
+        :param quid: the question id for existed pair selection
+
+        :return: the tuple of four values with languages names and phrase on both of themh
         """
 
         row = (
@@ -175,15 +221,24 @@ class SessionController:
     def record_users_result(self, uuid: str, quid: str, user_answer: str, score: float):
         """
         Set question status of user
+
+        :param uuid: the user id to record in the table of actions
+        :param quid: the question id to record in the table of actions
+        :param user_answer: the user answer to record in the table of action
+        :param score: the user's answer score to record in the table of actions
         """
         db.session.query(Action).filter(
             and_(Action.quid == quid, Action.uuid == uuid)
         ).update({"user_answer": user_answer, "score": round(score, 3)})
         db.session.commit()
 
-    def get_user_analysis(self, uuid: str):
+    def get_user_analysis(self, uuid: str) -> dict:
         """
         Get user's session analysis
+
+        :param uuid: the user id to analyze
+
+        :return: dictionary of the main info about user's success
         """
         # retrieve info from base
         actions = [
@@ -204,23 +259,28 @@ class SessionController:
         answered_questions_number = len(answered_questions)
         unanswered_questions_number = len(scores) - len(answered_questions)
         average_score = np.mean(answered_questions)
+        message = "Study more, lazy boy!"
 
-        return {
-            "target_languages_counts": slangs_counts,
-            "answered_questions_number": answered_questions_number,
-            "unanswered_questions_number": unanswered_questions_number,
-            "average_score": average_score,
-            "Inference": "Study more, lazy boy!",
-        }
+        return (
+            slangs_counts,
+            answered_questions,
+            answered_questions_number,
+            unanswered_questions_number,
+            average_score,
+            message,
+        )
 
-    def upload_phrases_to_db(self, df: pd.DataFrame):
+    def upload_phrases_to_db(self, dataframe: pd.DataFrame):
         """
         Upload provided data to database replacing the previous one
+
+        :param dataframe: pandas dataframe to upload to base
+
         """
         # check needed columns
         assert all(
             [
-                col in df.columns
+                col in dataframe.columns
                 for col in ["level", "english", "russian", "ukrainian", "french"]
             ]
         )
@@ -229,6 +289,6 @@ class SessionController:
         dbconnector = DatabaseConnector(
             "langflow", "postgres", 123456, "localhost", 5432
         )
-        dbconnector.upload_df_table(df, "public", "phrases", if_exists="replace")
-
-        return 0
+        dbconnector.upload_df_table(
+            dataframedf, "public", "phrases", if_exists="replace"
+        )

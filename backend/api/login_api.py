@@ -1,14 +1,15 @@
 import json
 import traceback
 
-from . import api, request, jsonify, session
+from flask import request, jsonify
+from flasgger.utils import swag_from
+
+from . import api, session
 
 
 @api.route("/login", methods=["POST"])
+@swag_from("swaggers/login_api.yml")
 def login_api():
-    """
-    User login endpoint.
-    """
     try:
         req = request.get_json()
         username = req["username"]

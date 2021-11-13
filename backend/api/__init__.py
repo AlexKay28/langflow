@@ -1,4 +1,6 @@
 from flask import Blueprint, request, jsonify
+from flasgger.utils import swag_from
+
 from utils.session_object import SessionController
 
 session = SessionController()

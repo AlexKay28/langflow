@@ -1,0 +1,68 @@
+Question generation endpoint. Automaticly select question in a
+smart way using previous user answers history, or common users
+experience for anonimously authorized ones.
+---
+description: Client side interaction with server
+consumes:
+- "application/json"
+produces:
+- "application/json"
+parameters:
+  - in: header
+    name: headers_params
+    required: true
+    schema:
+      id: question_api_header
+      required:
+        - session_token
+      properties:
+        session_token:
+          type: string
+          description: user's session token
+  - in: body
+    name: body_params
+    required: true
+    schema:
+      id: question_api_body
+      required:
+        - username
+        - password
+        - is_anon
+      properties:
+        username:
+          type: string
+          description: The user's name for logging to the server
+        password:
+          type: string
+          description: The user's password for logging to the server
+        is_anon:
+          type: boolean
+          description: The indicator of the type of user
+
+responses:
+  500:
+      description: The error on the server side
+      schema:
+        properties:
+          status:
+            type: integer
+            description: Status code
+          message:
+            type: string
+            description: Short occured error summary
+          traceback:
+            type: string
+            description: Full occured error summary
+  200:
+      description: Access token for user intercation
+      schema:
+        properties:
+          question_token:
+            type: string
+            description: The created user token
+          question:
+            type: string
+            description: The known language phrase
+          answer:
+            type: string
+            description: The target language phrase

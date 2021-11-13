@@ -1,0 +1,54 @@
+User login endpoint. Allows yoused to get session token for
+intercation with server side. Considered as the first endpoint
+before any intercations on the web for already existed user or
+the user who whorks anonimously
+---
+description: Client side interaction with server
+consumes:
+  - application/json
+parameters:
+  - name: body
+    in: body
+    required: true
+    schema:
+      id: login_api_body
+      required:
+        - username
+        - password
+        - is_anon
+      properties:
+        username:
+          type: string
+          description: The user's name for logging to the server
+        password:
+          type: string
+          description: The user's password for logging to the server
+        is_anon:
+          type: boolean
+          description: The indicator of the type of user
+
+
+responses:
+  500:
+      description: The error on the server side
+      schema:
+        properties:
+          status:
+            type: integer
+            description: Status code
+          message:
+            type: string
+            description: Short occured error summary
+          traceback:
+            type: string
+            description: Full occured error summary
+  200:
+      description: Access token for user intercation
+      schema:
+        properties:
+          status:
+            type: integer
+            description: Status code
+          session_token:
+            type: integer
+            description: The provided to user his session token

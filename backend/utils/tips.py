@@ -8,6 +8,9 @@ MISTAKE_TRESHOLD = 5
 def show_differences(real_answer: str, user_answer: str) -> str:
     """
     Function shows difference between the users answer and the correct one
+
+    :param real_answer: the answer from the base which is ideal for question
+    :param user_answer: the answer from user which should be compared with real_answer
     """
     if (
         sum([1 for f in difflib.ndiff(real_answer, user_answer) if f[0] != " "])

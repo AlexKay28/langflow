@@ -1,15 +1,17 @@
 import json
 import traceback
 
+from flask import request, jsonify
+from flasgger.utils import swag_from
+
 from . import api, request, jsonify, session
 
 
 @api.route("/question", methods=["POST"])
+@swag_from("swaggers/question_api.yml")
 def question_api():
     """
     Generate question for particular user
-    Endpoint gets the keys:
-        uuid,
     """
     try:
         # auth token

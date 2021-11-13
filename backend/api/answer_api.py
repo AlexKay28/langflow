@@ -4,16 +4,15 @@ import traceback
 from utils.tips import show_differences
 from utils.comparing import compare_answers
 
+from flask import request, jsonify
+from flasgger.utils import swag_from
+
 from . import api, request, jsonify, session
 
 
 @api.route("/answer", methods=["PATCH"])
+@swag_from("swaggers/answer_api.yml")
 def answer_api():
-    """
-    Evaluate users answer and return him the answer analysis back
-    Endpoint gets the keys:
-        uuid, qid, second_language_phrase_answer
-    """
     try:
         # auth token
         session_token = request.headers.get("session_token")

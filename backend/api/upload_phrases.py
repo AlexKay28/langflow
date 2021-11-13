@@ -25,8 +25,7 @@ def upload_phrases():
 
         # work with provided file
         phrases = pd.read_csv(phrases_file)
-        if session.upload_phrases_to_db(phrases):
-            raise Exception("Uploading phrases dataframe to database was failed!")
+        session.upload_phrases_to_db(phrases)
 
         return "Phrases was uploaded to database SUCCESSFULLY!"
     except Exception as e:

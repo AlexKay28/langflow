@@ -1,0 +1,73 @@
+Answer collection endpoint. Gets user's answer and makes analysis of
+its correctness. Patch data in database recording the learning process.
+This endpoint utilized ML approach for answer correctness comparing.
+---
+description: Client side interaction with server
+consumes:
+- "application/json"
+produces:
+- "application/json"
+parameters:
+  - in: header
+    name: headers_params
+    required: true
+    schema:
+      id: question_api_header
+      required:
+        - session_token
+      properties:
+        session_token:
+          type: string
+          description: user's session token
+  - in: body
+    name: body_params
+    required: true
+    schema:
+      id: question_api_body
+      required:
+        - question_token
+        - user_answer
+      properties:
+        question_token:
+          type: string
+          description: The question token to find phrases in db
+        user_answer:
+          type: string
+          description: The user's answer which should be recorded
+
+responses:
+  500:
+      description: The error on the server side
+      schema:
+        properties:
+          status:
+            type: integer
+            description: Status code
+          message:
+            type: string
+            description: Short occured error summary
+          traceback:
+            type: string
+            description: Full occured error summary
+  200:
+      description: Access token for user intercation
+      schema:
+        properties:
+          question:
+            type: string
+            description: Asked to user question
+          answer:
+            type: string
+            description: The correct answer on question
+          answer_user:
+            type: string
+            description: The answer provided from the user side
+          is_equal:
+            type: boolean
+            description: The inference about user's answer correctness
+          score:
+            type: float
+            description: The metric of similarity between user and real answer
+          differences:
+            type: string
+            description: Generated tips about users mistakes
