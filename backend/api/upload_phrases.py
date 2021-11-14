@@ -8,7 +8,7 @@ from flasgger.utils import swag_from
 from . import api, request, jsonify, session
 
 
-@api.route("/upload_phrases", methods=["POST"])
+@api.route("/phrases/file", methods=["POST"])
 @swag_from("swaggers/upload_phrases.yml")
 def upload_phrases():
     """

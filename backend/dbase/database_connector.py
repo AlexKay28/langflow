@@ -52,24 +52,3 @@ class DatabaseConnector:
         self.conn.close()
         self.engine.dispose()
         self.cur.close()
-
-    def upload_df_table(
-        self, df: pd.DataFrame, schema: str, table_name: str, if_exists: str = "fail"
-    ):
-        """
-        Upload pd.DataFrame table to SQL database
-
-        :param df: dataframe which is needed to be loaded
-        :param schema: database schema
-        :param table_name: name if the table in base
-        :param if_exists: How to behave if the table already exists
-         available values {‘fail’, ‘replace’, ‘append’}
-        """
-        df.to_sql(
-            table_name,
-            self.engine,
-            schema=schema,
-            if_exists=if_exists,
-            index=False,
-            method="multi",
-        )
