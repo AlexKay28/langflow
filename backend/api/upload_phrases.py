@@ -5,7 +5,7 @@ import traceback
 from . import api, request, jsonify, session
 
 
-@api.route("/upload_phrases", methods=["POST"])
+@api.route("/phrases/file", methods=["POST"])
 def upload_phrases():
     """
     Upload phrases to database using csv file

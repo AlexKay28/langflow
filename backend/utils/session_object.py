@@ -229,6 +229,12 @@ class SessionController:
         dbconnector = DatabaseConnector(
             "langflow", "postgres", 123456, "localhost", 5432
         )
-        dbconnector.upload_df_table(df, "public", "phrases", if_exists="replace")
-
+        df.to_sql(
+            "phrases",
+            dbconnector.engine,
+            schema="public",
+            if_exists="replace",
+            index=False,
+            method="multi",
+        )
         return 0
