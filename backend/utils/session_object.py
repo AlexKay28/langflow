@@ -275,7 +275,6 @@ class SessionController:
         Upload provided data to database replacing the previous one
 
         :param dataframe: pandas dataframe to upload to base
-
         """
         # check needed columns
         assert all(
