@@ -8,7 +8,9 @@ from dbase import db
 class Action(db.Model):
     __tablename__ = "actions"
 
-    uuid = db.Column(UUID(as_uuid=True), db.ForeignKey("anon_users.uuid"))
+    uuid = db.Column(
+        UUID(as_uuid=True),
+    )
     quid = db.Column(UUID(as_uuid=True), primary_key=True)
     quid_token = db.Column(db.String(16), unique=True, nullable=False)
     phrase_id = db.Column(db.Integer, db.ForeignKey("phrases.id"))

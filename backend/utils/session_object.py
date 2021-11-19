@@ -54,6 +54,38 @@ class SessionController:
         return uuid in self.db.users_uuid_list
 
     @staticmethod
+    def create_user(username: str, password: str, email: bool) -> Tuple[str, bool]:
+        """
+        Create new authorized user in base
+
+        :param username: provided username.
+        :param password: provided password.
+        :param email: user email to contact.
+        """
+
+        user = db.session.query(UserAuthorized).filter(
+            and_(
+                UserAuthorized.username == username,
+                UserAuthorized.email == email,
+            )
+        )
+        if user.first() is not None:
+            return f"Username <{username}> and/or email <{email}> already exist"
+
+        uuid_generated = generate_random_token("uuid4")
+        user = UserAuthorized(
+            username=username,
+            password=password,
+            email=email,
+            uuid=uuid_generated,
+            session_token=None,
+        )
+        db.session.add(user)
+        db.session.commit()
+
+        return f"User <{username}> was created!"
+
+    @staticmethod
     def activate_session_token(
         username: str, password: str, is_anon: bool
     ) -> Tuple[str, bool]:
@@ -66,10 +98,11 @@ class SessionController:
 
         :return: tuple of values - generated token and generation status check (str, bool)
         """
+        session_token_generated = generate_random_token("os_8")
 
         if is_anon:
+            # create anon user and set session token
             uuid_generated = generate_random_token("uuid4")
-            session_token_generated = generate_random_token("os_8")
             user = UserAnon(
                 username=username,
                 uuid=uuid_generated,
@@ -78,10 +111,20 @@ class SessionController:
             db.session.add(user)
             db.session.commit()
         else:
-            # TODO
-            raise NotImplementedError
+            # find existed user and set session token
+            user = db.session.query(UserAuthorized).filter(
+                and_(
+                    UserAuthorized.username == username,
+                    UserAuthorized.password == password,
+                )
+            )
+            if user.first() is not None:
+                user.update({"session_token": session_token_generated})
+                db.session.commit()
+            else:
+                raise ValueError("Wrong username or password")
 
-        return session_token_generated, True
+        return session_token_generated, "Session token is signed"
 
     @staticmethod
     def get_user_uuid(session_token: str) -> str:
@@ -92,12 +135,19 @@ class SessionController:
 
         :return: uuid of user from base.
         """
-        uuid = (
-            db.session.query(UserAnon.uuid)
-            .filter(UserAnon.session_token == session_token)
-            .scalar()
+        authorized_user = db.session.query(UserAuthorized.uuid).filter(
+            UserAuthorized.session_token == session_token
         )
-        return str(uuid)
+        if authorized_user.first() is not None:
+            return str(authorized_user.scalar())
+
+        anon_user = db.session.query(UserAnon.uuid).filter(
+            UserAnon.session_token == session_token
+        )
+        if anon_user.first() is not None:
+            return str(anon_user.scalar())
+
+        raise ValueError("Defined session token does not exist!")
 
     @staticmethod
     def get_question_quid(quid_token: str) -> str:
