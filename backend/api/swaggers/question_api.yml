@@ -9,35 +9,28 @@ produces:
 - "application/json"
 parameters:
   - in: header
-    name: headers_params
+    name: session_token
     required: true
-    schema:
-      id: question_api_header
-      required:
-        - session_token
-      properties:
-        session_token:
-          type: string
-          description: user's session token
-  - in: body
+    description: user's session token
+  - in: body 
     name: body_params
     required: true
     schema:
       id: question_api_body
       required:
-        - username
-        - password
-        - is_anon
+        - first_language
+        - second_language
+        - level
       properties:
-        username:
+        first_language:
           type: string
-          description: The user's name for logging to the server
-        password:
+          description: The known language
+        second_language:
           type: string
-          description: The user's password for logging to the server
-        is_anon:
-          type: boolean
-          description: The indicator of the type of user
+          description: The target language
+        level:
+          type: integer
+          description: The hardness level
 
 responses:
   500:

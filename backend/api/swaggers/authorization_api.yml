@@ -1,0 +1,53 @@
+User authorization endpoit. Allows to create user his own account
+on the sice and use it for result caching. Endpoint provides cridentials
+to the backend and create user in base if username and email wasnt
+registered before.
+---
+description: Client side interaction with server
+consumes:
+- "application/json"
+produces:
+- "application/json"
+parameters:
+  - name: body
+    in: body
+    required: true
+    schema:
+      id: login_api_body
+      required:
+        - username
+        - password
+        - email
+      properties:
+        username:
+          type: string
+          description: The user's name for logging to the server
+        password:
+          type: string
+          description: The user's password for logging to the server
+        email:
+          type: string
+          description: The user's email (po4Ta)
+
+
+responses:
+  500:
+      description: The error on the server side
+      schema:
+        properties:
+          status:
+            type: integer
+            description: Status code
+          message:
+            type: string
+            description: Short occured error summary
+          traceback:
+            type: string
+            description: Full occured error summary
+  200:
+      description: Access token for user intercation
+      schema:
+        properties:
+          status:
+            type: string
+            description: Status description
