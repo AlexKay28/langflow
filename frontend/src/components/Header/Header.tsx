@@ -18,6 +18,10 @@ const Header = (): JSX.Element => {
                     <Nav.Link href="/">Home</Nav.Link>
                     <Nav.Link href="https://github.com/AlexKay28/langflow">Github</Nav.Link>
                 </Nav>
+                <Nav>
+                    <Nav.Link href="/login">Sign in</Nav.Link>
+                    <Nav.Link href="/register">Sign up</Nav.Link>
+                </Nav>
             </Container>
             <GoPractice/>
         </Navbar>
