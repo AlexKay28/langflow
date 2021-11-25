@@ -48,3 +48,12 @@ responses:
             description: Full occured error summary
   200:
       description: Message about success
+      schema:
+        id: upload_phrases_api_200
+        properties:
+          status:
+            type: integer
+            description: Status code
+          message:
+            type: string
+            description: Message from backend

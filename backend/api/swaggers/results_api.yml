@@ -37,6 +37,9 @@ responses:
       description: Access token for user intercation
       schema:
         properties:
+          status:
+            type: integer
+            description: Status code
           slangs_counts:
             type: object
             description: The asked target languages counts

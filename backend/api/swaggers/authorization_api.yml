@@ -49,5 +49,8 @@ responses:
       schema:
         properties:
           status:
+            type: integer
+            description: Status code
+          message:
             type: string
-            description: Status description
+            description: Message from backend

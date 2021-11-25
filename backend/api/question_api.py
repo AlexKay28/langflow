@@ -33,6 +33,7 @@ def question_api():
 
         return jsonify(
             {
+                "status": 200,
                 "question_token": question_token,
                 "question": first_language_phrase,
                 "answer": second_language_phrase,

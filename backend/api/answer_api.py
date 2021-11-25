@@ -43,6 +43,7 @@ def answer_api():
 
         return jsonify(
             {
+                "status": 200,
                 "question": flang_phrase,
                 "answer": slang_phrase,
                 "answer_user": user_answer,

@@ -12,7 +12,7 @@ parameters:
     name: session_token
     required: true
     description: user's session token
-  - in: body 
+  - in: body
     name: body_params
     required: true
     schema:
@@ -50,6 +50,9 @@ responses:
       description: Access token for user intercation
       schema:
         properties:
+          status:
+            type: integer
+            description: Status code
           question_token:
             type: string
             description: The created user token
