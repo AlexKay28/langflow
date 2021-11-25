@@ -9,15 +9,11 @@ consumes:
 produces:
 - "application/json"
 parameters:
-  - name: body
-    in: body
+  - in: body
+    name: body
     required: true
     schema:
       id: login_api_body
-      required:
-        - username
-        - password
-        - is_anon
       properties:
         username:
           type: string
@@ -34,6 +30,7 @@ responses:
   500:
       description: The error on the server side
       schema:
+        id: login_api_500
         properties:
           status:
             type: integer
@@ -47,6 +44,7 @@ responses:
   200:
       description: Access token for user intercation
       schema:
+        id: login_api_200
         properties:
           status:
             type: integer
