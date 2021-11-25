@@ -21,7 +21,7 @@ parameters:
         email:
           type: string
           description: The user's email (po4Ta)
-
+          
 responses:
   500:
       description: The error on the server side
