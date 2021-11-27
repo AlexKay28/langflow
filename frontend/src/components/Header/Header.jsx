@@ -31,7 +31,7 @@ const Header = () => {
                 </Nav>
                 {!loggedIn ? <Nav>
                     <Nav.Link href="/login">Sign in</Nav.Link>
-                    <Nav.Link href="/register">Sign up</Nav.Link>
+                    <Nav.Link href="/registration">Sign up</Nav.Link>
                 </Nav> :
                 <Nav>
                     <Nav.Link href="/login"  onClick={logOut}>Logout</Nav.Link>

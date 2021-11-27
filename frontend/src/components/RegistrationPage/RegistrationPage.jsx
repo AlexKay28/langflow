@@ -20,7 +20,7 @@ const theme = createTheme({
     }
 })
 
-const RegisterPage = (props) => {
+const RegistrationPage = (props) => {
     const form = useRef();
 
     const [username, setUsername] = useState("");
@@ -148,4 +148,4 @@ const RegisterPage = (props) => {
     );
 }
 
-export default RegisterPage
+export default RegistrationPage

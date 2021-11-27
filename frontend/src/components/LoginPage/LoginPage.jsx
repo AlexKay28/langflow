@@ -122,7 +122,7 @@ const LoginPage = (props) => {
                                 </Button>
                                 <Grid container justifyContent="flex-end">
                                     <Grid item>
-                                        <Link href="/register" variant="body2">
+                                        <Link href="/registration" variant="body2">
                                         New user? Sign up to create your account
                                         </Link>
                                     </Grid>
