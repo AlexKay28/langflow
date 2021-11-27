@@ -16,7 +16,12 @@ def authorization_api():
         password = req["password"]
         email = req["email"]
         result = session.create_user(username, password, email)
-        return jsonify({"status": result})
+        return jsonify(
+            {
+                "status": 200,
+                "message": result,
+            }
+        )
     except Exception as e:
         return jsonify(
             {

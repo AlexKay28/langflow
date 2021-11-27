@@ -19,7 +19,10 @@ def login_api():
             username, password, is_anon
         )
         return jsonify(
-            {"session_token": session_token_generated, "status": user_existance}
+            {
+                "status": 200,
+                "session_token": session_token_generated,
+            }
         )
     except Exception as e:
         return jsonify(

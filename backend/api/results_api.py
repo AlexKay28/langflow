@@ -26,6 +26,7 @@ def results_api():
 
         return jsonify(
             {
+                "status": 200,
                 "target_languages_counts": slangs_counts,
                 "answered_questions_number": answered_questions_number,
                 "unanswered_questions_number": unanswered_questions_number,

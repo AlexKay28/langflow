@@ -30,8 +30,13 @@ def upload_phrases():
         # work with provided file
         phrases = pd.read_csv(phrases_file)
         session.upload_phrases_to_db(phrases)
-        
-        return "Phrases was uploaded to database SUCCESSFULLY!"
+        message = "phrases uploaded!"
+        return jsonify(
+            {
+                "status": 200,
+                "message": message,
+            }
+        )
     except Exception as e:
         return jsonify(
             {

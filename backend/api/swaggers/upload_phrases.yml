@@ -9,24 +9,14 @@ produces:
 - string
 parameters:
   - in: header
-    name: headers_params
+    name: session_token
     required: true
-    schema:
-      id: question_api_header
-      required:
-        - session_token
-      properties:
-        session_token:
-          type: string
-          description: user's session token
-
+    description: user's session token
   - in: body
     name: body_params
     required: true
     schema:
       id: upload_phrases_api_body
-      required:
-        - file
       properties:
         file:
           type: string
@@ -36,6 +26,7 @@ responses:
   500:
       description: The error on the server side
       schema:
+        id: upload_phrases_api_500
         properties:
           status:
             type: integer
@@ -48,3 +39,12 @@ responses:
             description: Full occured error summary
   200:
       description: Message about success
+      schema:
+        id: upload_phrases_api_200
+        properties:
+          status:
+            type: integer
+            description: Status code
+          message:
+            type: string
+            description: Message from backend
