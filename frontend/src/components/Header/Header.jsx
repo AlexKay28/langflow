@@ -27,7 +27,6 @@ const Header = () => {
                 </Navbar.Brand>
                 <Nav className="me-auto">
                     <Nav.Link href="/">Home</Nav.Link>
-                    <Nav.Link href="https://github.com/AlexKay28/langflow">Github</Nav.Link>
                 </Nav>
                 {!loggedIn ? <Nav>
                     <Nav.Link href="/login">Sign in</Nav.Link>
