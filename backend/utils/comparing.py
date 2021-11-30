@@ -11,28 +11,6 @@ CORRECTNESS_RATE = 0.98
 
 PATH_TO_MODELS = "language_models/"
 
-#
-# def load_language_model(model_name: str, extension: str = "gz"):
-#     """
-#     Models are stored as .bit.tar.gz
-#     Fore session working they are needed to be extracted
-#
-#     :param model_name: name of model to upload for similarity comparing
-#     :param extension: the extenstion of the binary model file
-#
-#     :return: loaded fasttext model
-#     """
-#     model_name_ext = f"{model_name}5.bin"
-#     archive_path = os.path.join(PATH_TO_MODELS, f"{model_name_ext}.{extension}")
-#     model_path = os.path.join(PATH_TO_MODELS, f"{model_name_ext}")
-#
-#     if model_name_ext not in os.listdir(PATH_TO_MODELS):
-#         with gzip.open(archive_path, "rb") as file_in:
-#             with open(model_path, "wb") as file_out:
-#                 shutil.copyfileobj(file_in, file_out)
-#
-#     return fasttext.load_model(model_path)
-
 
 def load_language_model(model_name: str, extension: str = ".bin"):
     """

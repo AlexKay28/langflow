@@ -9,15 +9,10 @@ produces:
 - "application/json"
 parameters:
   - in: header
-    name: headers_params
+    name: session_token
     required: true
-    schema:
-      required:
-        - session_token
-      properties:
-        session_token:
-          type: string
-          description: user's session token
+    type: string
+    description: user's session token
 responses:
   500:
       description: The error on the server side

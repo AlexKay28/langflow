@@ -9,16 +9,10 @@ produces:
 - string
 parameters:
   - in: header
-    name: headers_params
+    name: session_token
     required: true
-    schema:
-      required:
-        - session_token
-      properties:
-        session_token:
-          type: string
-          description: user's session token
-
+    type: string
+    description: user's session token
   - in: body
     name: body_params
     required: true

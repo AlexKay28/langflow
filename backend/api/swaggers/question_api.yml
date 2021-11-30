@@ -11,6 +11,7 @@ parameters:
   - in: header
     name: session_token
     required: true
+    type: string
     description: user's session token
   - in: body
     name: body_params
