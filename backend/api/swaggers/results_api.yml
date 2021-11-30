@@ -3,8 +3,6 @@ its correctness. Patch data in database recording the learning process.
 This endpoint utilized ML approach for answer correctness comparing.
 ---
 description: Client side interaction with server
-consumes:
-- "application/json"
 produces:
 - "application/json"
 parameters:
@@ -17,6 +15,7 @@ responses:
   500:
       description: The error on the server side
       schema:
+        id: result_api_500
         properties:
           status:
             type: integer
@@ -30,6 +29,7 @@ responses:
   200:
       description: Access token for user intercation
       schema:
+        id: result_api_200
         properties:
           status:
             type: integer

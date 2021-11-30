@@ -17,10 +17,6 @@ parameters:
     name: body_params
     required: true
     schema:
-      required:
-        - first_language
-        - second_language
-        - level
       properties:
         first_language:
           type: string
@@ -36,6 +32,7 @@ responses:
   500:
       description: The error on the server side
       schema:
+        id: question_api_500
         properties:
           status:
             type: integer
@@ -49,6 +46,7 @@ responses:
   200:
       description: Access token for user intercation
       schema:
+        id: question_api_200
         properties:
           status:
             type: integer

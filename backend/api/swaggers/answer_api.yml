@@ -32,6 +32,7 @@ responses:
   500:
       description: The error on the server side
       schema:
+        id: answer_api_500
         properties:
           status:
             type: integer
@@ -45,6 +46,7 @@ responses:
   200:
       description: Access token for user intercation
       schema:
+        id: answer_api_200
         properties:
           question:
             type: string

@@ -1,7 +1,7 @@
 import React, {useState, useEffect} from 'react'
-import api from "../../utils/api";
-import CircularProgress from '@material-ui/core/CircularProgress';
-import Box from '@material-ui/core/Box';
+import api from "../../utils/api"
+import CircularProgress from '@material-ui/core/CircularProgress'
+import Box from '@material-ui/core/Box'
 import './question.scss'
 
 const Question = () => {

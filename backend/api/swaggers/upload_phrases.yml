@@ -17,8 +17,6 @@ parameters:
     name: body_params
     required: true
     schema:
-      required:
-        - file
       properties:
         file:
           type: string
@@ -28,6 +26,7 @@ responses:
   500:
       description: The error on the server side
       schema:
+        id: upload_phrases_api_500
         properties:
           status:
             type: integer
