@@ -1,7 +1,7 @@
 import os
 import gzip
 import shutil
-import fasttext
+import gensim
 import numpy as np
 from scipy.spatial.distance import cosine
 
@@ -11,27 +11,41 @@ CORRECTNESS_RATE = 0.98
 
 PATH_TO_MODELS = "language_models/"
 
+#
+# def load_language_model(model_name: str, extension: str = "gz"):
+#     """
+#     Models are stored as .bit.tar.gz
+#     Fore session working they are needed to be extracted
+#
+#     :param model_name: name of model to upload for similarity comparing
+#     :param extension: the extenstion of the binary model file
+#
+#     :return: loaded fasttext model
+#     """
+#     model_name_ext = f"{model_name}5.bin"
+#     archive_path = os.path.join(PATH_TO_MODELS, f"{model_name_ext}.{extension}")
+#     model_path = os.path.join(PATH_TO_MODELS, f"{model_name_ext}")
+#
+#     if model_name_ext not in os.listdir(PATH_TO_MODELS):
+#         with gzip.open(archive_path, "rb") as file_in:
+#             with open(model_path, "wb") as file_out:
+#                 shutil.copyfileobj(file_in, file_out)
+#
+#     return fasttext.load_model(model_path)
 
-def load_language_model(model_name: str, extension: str = "gz"):
+
+def load_language_model(model_name: str, extension: str = ".bin"):
     """
-    Models are stored as .bit.tar.gz
-    Fore session working they are needed to be extracted
+    Load fasttext model
 
     :param model_name: name of model to upload for similarity comparing
     :param extension: the extenstion of the binary model file
 
     :return: loaded fasttext model
     """
-    model_name_ext = f"{model_name}5.bin"
-    archive_path = os.path.join(PATH_TO_MODELS, f"{model_name_ext}.{extension}")
+    model_name_ext = f"{model_name}300_quantized.bin"
     model_path = os.path.join(PATH_TO_MODELS, f"{model_name_ext}")
-
-    if model_name_ext not in os.listdir(PATH_TO_MODELS):
-        with gzip.open(archive_path, "rb") as file_in:
-            with open(model_path, "wb") as file_out:
-                shutil.copyfileobj(file_in, file_out)
-
-    return fasttext.load_model(model_path)
+    return gensim.models.fasttext.FastTextKeyedVectors.load(model_path)
 
 
 def normalize_form_of_answer(answer: str) -> str:
@@ -63,25 +77,17 @@ def tokenize_answer(answer: str) -> List:
     return tokens
 
 
-def get_phrase_vector(
-    language_model, phrase_tokens: List, approach: str = None
-) -> np.ndarray:
+def get_phrase_vector(language_model, phrase_tokens: List) -> np.ndarray:
     """
     Get phrase vector using language model which provides each
     containing token embedding
 
     :param language_model: defined language model for similarity processing
     :param phrase_tokens: the list of tokens which is going to be norlmalized
-    :param approach: the way how to aggreagate tokens vectors
 
     :return: the numpy array of aggregated vector
     """
-    if not approach:
-        phrase_vec = language_model.get_sentence_vector(" ".join(phrase_tokens))
-    elif approach == "mean":
-        phrase_tokes_vec = [language_model[tok] for tok in phrase_tokens]
-        phrase_vec = np.mean(phrase_tokens, axis=0)
-    return phrase_vec
+    return language_model[" ".join(phrase_tokens)]
 
 
 def get_similarity(vec1: np.ndarray, vec2: np.ndarray, metric: str = "cosine") -> float:

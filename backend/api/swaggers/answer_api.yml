@@ -12,7 +12,6 @@ parameters:
     name: headers_params
     required: true
     schema:
-      id: question_api_header
       required:
         - session_token
       properties:
@@ -23,7 +22,6 @@ parameters:
     name: body_params
     required: true
     schema:
-      id: question_api_body
       required:
         - question_token
         - user_answer

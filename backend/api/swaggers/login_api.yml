@@ -13,7 +13,6 @@ parameters:
     in: body
     required: true
     schema:
-      id: login_api_body
       required:
         - username
         - password
