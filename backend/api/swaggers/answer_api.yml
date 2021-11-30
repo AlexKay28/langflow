@@ -17,9 +17,6 @@ parameters:
     name: body_params
     required: true
     schema:
-      required:
-        - question_token
-        - user_answer
       properties:
         question_token:
           type: string
