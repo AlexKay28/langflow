@@ -23,6 +23,7 @@ services:
         container_name: langflow_application_front
         volumes:
           - ./frontend:/frontend
+          - ./frontend/node_modules
         ports:
           - 3000:3000
         network_mode: host
