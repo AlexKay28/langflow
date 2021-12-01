@@ -17,7 +17,7 @@ const theme = createTheme({
 const GoPractice = (props: any): JSX.Element => {
     const [firstLanguage, setFirstLanguage] = React.useState<string>('english');
     const [secondLanguage, setSecondLanguage] = React.useState<string>('russian');
-    const [level, setLevel] = React.useState<string>('0');
+    const [level, setLevel] = React.useState<string>('1');
     const [openLevel, setOpenLevel] = React.useState(false);
     const [openFirstLanguage, setOpenFirstLanguage] = React.useState(false);
     const [openSecondLanguage, setOpenSecondLanguage] = React.useState(false);
