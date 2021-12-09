@@ -12,15 +12,15 @@ class QuestionSpace:
         Type:
         Num     Observation                   Representation
         0       The shift vector till
-                the first closest question    (length, angle, id)
+                the first closest question    (n_dim_vec)
         1       The shift vector till
-                the second closest question   (length, angle, id)
+                the second closest question   (n_dim_vec)
         2       The shift vector till
-                the third closest question    (length, angle, id)
+                the third closest question    (n_dim_vec)
         3       The shift vector till
-                the fourth closest question   (length, angle, id)
+                the fourth closest question   (n_dim_vec)
         4       The shift vector till
-                the fifth closest question    (length, angle, id)
+                the fifth closest question    (n_dim_vec)
     Actions:
         Type: Discrete(2)
         Num   Action
@@ -38,56 +38,100 @@ class QuestionSpace:
     """
 
     def __init__(self):
-        self.n_questions_to_consider = 5
-
         # shift vectores (length, angle, id)
         self.shift_vectores_matrix = [
-            [(0, 0, 0), (0.76, 0.14, 1), (0.54, -0.43, 2)],
-            [(0.34, 0.53, 0), (0, 0, 1), (0.43, -0.66, 2)],
-            [(0.91, 0.92, 0), (0.76, -0.04, 1), (0, 0, 2)],
+            (0, 0, [0.0, 0.0, 0.0]),
+            (0, 1, [1.0, 1.0, 0.0]),
+            (0, 2, [1.0, 0.0, 1.0]),
+            (1, 0, [-1.0, -1.0, 0.0]),
+            (1, 1, [0.0, 0.0, 0.0]),
+            (1, 2, [0.0, 1.0, 0.0]),
+            (2, 0, [-1.0, 0.0, -1.0]),
+            (2, 1, [1.0, -1.0, 0.0]),
+            (2, 2, [0.0, 0.0, 0.0]),
         ]
         # successfullness transition matrix
         self.transition_success_matrix = [
-            [(float("-inf"), 0), (0.54, 1), (0.33, 2)],
-            [(0.22, 0), (float("-inf"), 1), (0.87, 2)],
-            [(0.92, 0), (0.66, 1), (float("-inf"), 2)],
+            (0, 0, 0.38),
+            (0, 1, 0.56),
+            (0, 2, 0.75),
+            (1, 0, 0.23),
+            (1, 1, 0.99),
+            (1, 2, 0.32),
+            (2, 0, 0.04),
+            (2, 1, 0.23),
+            (2, 2, 0.82),
         ]
 
+        self.n_questions_to_consider = 5
+        self.states = set([tr[0] for tr in self.shift_vectores_matrix])
+
+    def _get_appropriate_transitions(self, state_id):
+        """
+        Get appropriate shift vectores to all positions from existed data
+        :param state_id: interested state id
+        :return: list of transitions
+        """
+        return [
+            transition
+            for transition in self.shift_vectores_matrix
+            if tr[0] == state_id and tr[0] != tr[1]
+        ]
+
+    def _get_top_n_transitions(self, transitions, n_top):
+        """
+        Sort transitions
+        """
+        # sorted by length and selection of top n
+        sorted_transitions = sorted(vecs, key=lambda tr: -1 * np.linalg.norm(tr[2]))
+        return sorted_transitions[:n_top]
+
     def _get_user_answer_score(self, asked_question_id):
-        return 1
+        """
+        Get user obtained similarity score
+        """
+        return 1  # TODO
+
+    def _update_transition_success_matrix(self, previous_state, next_state, reward):
+        """
+        Update matrix using retrieved reward
+        """
+        pass  # TODO
 
     def step(self, action):
+        """
+        Perform a step
+        """
         # apply action and let user to gain reward
-        next_state_id = self.state[action][2]
-        reward = slef._get_user_answer_score(next_state_id)
+        previous_state, next_state, shift_vector = self.state[action]
+        reward = slef._get_user_answer_score(next_state)
+
+        # update success matrix
+        self._update_transition_success_matrix(previous_state, next_state, reward)
 
         # change state
-        closest_vecs = self.shift_vectores_matrix[next_state_id]
-        del realative_vecs[next_state_id]
+        all_possible_transitions = self._get_appropriate_transitions(next_state)
 
         # sort vecs
-        self.state = self._get_top_n_vectores(
-            relations_to_other_vecs, self.n_questions_to_consider
+        self.state = self._get_top_n_transitions(
+            all_possible_transitions, self.n_questions_to_consider
         )
 
         # still playing infinitely now
         done = True
 
-        return next_state, reward, done, {}
-
-    def _get_top_n_vectores(self, vecs, n_top):
-        # sorted by length and selection of top n
-        vecs = sorted(vecs, key=lambda vec: -vec[0])[:n_top]
-        return vecs
+        return self.state, reward, done, {}
 
     def reset(self, seed: int = None):
+        """
+        Reset state setting a new one randomly
+        """
         # select random row with vectores
-        random_state_id = np.random.choice(len(self.shift_vectores_matrix))
-        realative_vecs = self.shift_vectores_matrix[random_state_id]
-        del realative_vecs[random_state_id]
+        random_state_id = np.random.choice(self.states)
+        all_possible_transitions = self._get_appropriate_transitions(random_state_id)
 
         # sort vecs
-        self.state = self._get_top_n_vectores(
-            relations_to_other_vecs, self.n_questions_to_consider
+        self.state = self._get_top_n_transitions(
+            all_possible_transitions, self.n_questions_to_consider
         )
         return state
