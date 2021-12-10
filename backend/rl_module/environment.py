@@ -1,4 +1,5 @@
 import numpy as np
+from typing import Tuple
 
 
 class QuestionSpace:
@@ -66,7 +67,7 @@ class QuestionSpace:
         self.n_questions_to_consider = 5
         self.states = set([tr[0] for tr in self.shift_vectores_matrix])
 
-    def _get_appropriate_transitions(self, state_id):
+    def _get_appropriate_transitions(self, state_id: int) -> list[int]:
         """
         Get appropriate shift vectores to all positions from existed data
         :param state_id: interested state id
@@ -78,29 +79,48 @@ class QuestionSpace:
             if tr[0] == state_id and tr[0] != tr[1]
         ]
 
-    def _get_top_n_transitions(self, transitions, n_top):
+    def _get_top_n_transitions(self, transitions: list, n_top: int) -> list[int]:
         """
-        Sort transitions
+        Sort transitions by vector closeness.
+
+        :param transitions: All possible transitions from a state
+
+        :return: N top closest transitions.
         """
         # sorted by length and selection of top n
         sorted_transitions = sorted(vecs, key=lambda tr: -1 * np.linalg.norm(tr[2]))
         return sorted_transitions[:n_top]
 
-    def _get_user_answer_score(self, asked_question_id):
+    def _get_user_answer_score(self, asked_question_id: int) -> float:
         """
-        Get user obtained similarity score
-        """
-        return 1  # TODO
+        Get user obtained similarity score.
 
-    def _update_transition_success_matrix(self, previous_state, next_state, reward):
+        :param asked_question_id: Id of asked by user question in list of questions.
+
+        :return: Score gained by user.
         """
-        Update matrix using retrieved reward
+        return 1.0  # TODO
+
+    def _update_transition_success_matrix(
+        self, previous_state: list[float], next_state: list[float], reward: float
+    ) -> None:
+        """
+        Update matrix using retrieved reward.
+
+        :param previous_state: The state which already was answered by user.
+        :param next_state: The next state from transition.
+        :param reward: The answer closeness (reward) gained by user in the current state.
         """
         pass  # TODO
 
-    def step(self, action):
+    def step(self, action: int) -> Tuple[list, float, bool, dict]:
         """
-        Perform a step
+        Perform a transition step among the questions
+
+        :param action: Chosed transition from the agent's action space.
+
+        :return: The tuple with parameters -
+                 next state, reward, transition success status (done), transition info.
         """
         # apply action and let user to gain reward
         previous_state, next_state, shift_vector = self.state[action]
@@ -122,9 +142,13 @@ class QuestionSpace:
 
         return self.state, reward, done, {}
 
-    def reset(self, seed: int = None):
+    def reset(self, seed: int = None) -> list[float]:
         """
         Reset state setting a new one randomly
+
+        :param seed: The random seed for state generation.
+
+        :return: the vector of the question state.
         """
         # select random row with vectores
         random_state_id = np.random.choice(self.states)
