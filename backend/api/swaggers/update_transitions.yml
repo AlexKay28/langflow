@@ -1,4 +1,4 @@
-Allows administrator upload table with new phrases.
+Allows administrator update table with new phrases.
 ---
 description: Client side interaction with server
 consumes:
@@ -11,20 +11,12 @@ parameters:
     required: true
     type: string
     description: user's session token
-  - in: body
-    name: body_params
-    required: true
-    schema:
-      properties:
-        file:
-          type: string
-          description: The phrases for base
 
 responses:
   500:
       description: The error on the server side
       schema:
-        id: upload_phrases_api_500
+        id: update_transitions_api_500
         properties:
           status:
             type: integer
@@ -38,7 +30,7 @@ responses:
   200:
       description: Message about success
       schema:
-        id: upload_phrases_api_200
+        id: update_transitions_api_200
         properties:
           status:
             type: integer

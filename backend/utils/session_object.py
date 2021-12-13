@@ -10,7 +10,6 @@ from dbase import db
 from dbase.users import UserAuthorized, UserAnon
 from dbase.actions import Action
 from dbase.phrases import Phrase
-from dbase.database_connector import DatabaseConnector
 
 N_MAX_USERS = 25
 
@@ -319,31 +318,3 @@ class SessionController:
             average_score,
             message,
         )
-
-    def upload_phrases_to_db(self, dataframe: pd.DataFrame):
-        """
-        Upload provided data to database replacing the previous one
-
-        :param dataframe: pandas dataframe to upload to base
-        """
-        # check needed columns
-        assert all(
-            [
-                col in dataframe.columns
-                for col in ["level", "english", "russian", "ukrainian", "french"]
-            ]
-        )
-
-        # upload data to base
-        dbconnector = DatabaseConnector(
-            "langflow", "postgres", 123456, "localhost", 5432
-        )
-        df.to_sql(
-            "phrases",
-            dbconnector.engine,
-            schema="public",
-            if_exists="replace",
-            index=False,
-            method="multi",
-        )
-        return 0

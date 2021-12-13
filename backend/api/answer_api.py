@@ -7,7 +7,7 @@ from utils.comparing import compare_answers
 from flask import request, jsonify
 from flasgger.utils import swag_from
 
-from . import api, request, jsonify, session
+from . import api, session
 
 
 @api.route("/answer", methods=["PATCH"])

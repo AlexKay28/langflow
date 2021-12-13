@@ -5,7 +5,7 @@ import traceback
 from flask import request, jsonify
 from flasgger.utils import swag_from
 
-from . import api, request, jsonify, session
+from . import api, session, db_controller
 
 
 @api.route("/phrases/file", methods=["POST"])
@@ -29,7 +29,7 @@ def upload_phrases():
 
         # work with provided file
         phrases = pd.read_csv(phrases_file)
-        session.upload_phrases_to_db(phrases)
+        db_controller.upload_phrases_to_db(phrases)
         message = "phrases uploaded!"
         return jsonify(
             {
