@@ -17,7 +17,7 @@ def update_transitions():
         session_token = request.headers.get("session_token")
 
         # work with provided file
-        db_controller.update_transitions()
+        db_controller.update_transitions_global()
         message = "transitions updated!"
         return jsonify(
             {

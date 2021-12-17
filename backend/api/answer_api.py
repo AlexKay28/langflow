@@ -7,7 +7,7 @@ from utils.comparing import compare_answers
 from flask import request, jsonify
 from flasgger.utils import swag_from
 
-from . import api, session
+from . import api, session, db_controller
 
 
 @api.route("/answer", methods=["PATCH"])
@@ -35,6 +35,9 @@ def answer_api():
 
         # records users success/fail in his metadata
         session.record_users_result(uuid, quid, user_answer, score)
+
+        # update transition matrics on the fly
+        db_controller.update_transitions(slang, uuid)
 
         # generate tips for user
         differences = ""

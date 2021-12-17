@@ -4,9 +4,13 @@ import pandas as pd
 import itertools
 
 from sqlalchemy import and_, or_, not_
+from sqlalchemy import desc
 
 from dbase import db
 from dbase.database_connector import DatabaseConnector
+from dbase.actions import Action
+from dbase.transitions import TransitionSuccess, TransitionShift
+
 from utils.comparing import get_phrase_shift_vector
 
 
@@ -22,7 +26,9 @@ class DbController:
 
     def upload_phrases_to_db(self, dataframe: pd.DataFrame):
         """
-        Upload provided data to database replacing the previous one
+        Upload provided data to database replacing the previous one.
+        Methods uploads phrases to database, transition shift vector and
+        transition success matrices.
 
         :param dataframe: pandas dataframe to upload to base
         """
@@ -35,13 +41,13 @@ class DbController:
             ]
         )
 
-        dataframe = dataframe.sample(5)
         dataframe["id"] = dataframe.reset_index().index + 1
 
         # create transition shift table
         transition_shift_table = pd.DataFrame()
         # create transition success table
         transition_success_table = pd.DataFrame()
+
         transition_id = 0
         for idx_from, idx_to in itertools.combinations(range(dataframe.shape[0]), 2):
             if idx_from == idx_to:
@@ -52,7 +58,12 @@ class DbController:
                 transition_id += 1
                 phrase_from = phrases_from[language]
                 phrase_to = phrases_to[language]
-                shift_vector = get_phrase_shift_vector(language, phrase_from, phrase_to)
+
+                # calculate shift vector = n ^ 2 vecs
+                shift_vector = np.array(
+                    []
+                )  # get_phrase_shift_vector(language, phrase_from, phrase_to)
+
                 transition_shift_table = transition_shift_table.append(
                     {
                         "language": language,
@@ -112,9 +123,10 @@ class DbController:
 
         return 0
 
-    def update_transitions(self):
+    def update_transitions_global(self):
         """
-        Update transition success table in db using actions table.
+        Update whole transition success table in db using actions
+        table by single apply.
         """
 
         # read actions table
@@ -175,5 +187,67 @@ class DbController:
             index=False,
             method="multi",
         )
+
+        return 0
+
+    def update_transitions(self, language, uuid):
+        """
+        Update transitions for specified user
+        """
+
+        # select last two user actions
+        actions = [
+            {"phrase_id": r.phrase_id, "score": r.score}
+            for r in db.session.query(
+                Action.phrase_id,
+                Action.score,
+            )
+            .filter(Action.uuid == uuid)
+            .order_by(desc(Action.action_date))
+            .limit(2)
+        ]
+
+        # get previous & current question ids, score
+        previous_phrase_id = actions[1]["phrase_id"]
+        current_phrase_id = actions[0]["phrase_id"]
+        transition_score = actions[0]["score"]
+
+        # get existed average success
+        n_updates = (
+            db.session.query(TransitionSuccess.n_updates)
+            .filter(
+                and_(
+                    TransitionSuccess.language == language,
+                    TransitionSuccess.phrase_from == previous_phrase_id,
+                    TransitionSuccess.phrase_to == current_phrase_id,
+                )
+            )
+            .scalar()
+        )
+        average = (
+            db.session.query(TransitionSuccess.average_success)
+            .filter(
+                and_(
+                    TransitionSuccess.language == language,
+                    TransitionSuccess.phrase_from == previous_phrase_id,
+                    TransitionSuccess.phrase_to == current_phrase_id,
+                )
+            )
+            .scalar()
+        )
+
+        # inecrement
+        n_updates += 1
+        new_average_success = average + (transition_score - average) / n_updates
+
+        # update transition pair by score inecrementally
+        db.session.query(TransitionSuccess).filter(
+            and_(
+                TransitionSuccess.language == language,
+                TransitionSuccess.phrase_from == previous_phrase_id,
+                TransitionSuccess.phrase_to == current_phrase_id,
+            )
+        ).update({"average_success": new_average_success})
+        db.session.commit()
 
         return 0
