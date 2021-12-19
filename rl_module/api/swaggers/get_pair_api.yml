@@ -1,0 +1,53 @@
+Utilize RL approach to choose the next provided question to user.
+---
+description: Internal service
+consumes:
+- "application/json"
+produces:
+- "application/json"
+parameters:
+  - in: body
+    name: body_params
+    required: true
+    schema:
+      properties:
+        uuid:
+          type: string
+          description: The current user id
+        second_language:
+          type: string
+          description: Target language for user right now
+        level:
+          type: integer
+          description: The hardness level
+
+responses:
+  500:
+      description: The error on the server side
+      schema:
+        properties:
+          status:
+            type: integer
+            description: Status code
+          message:
+            type: string
+            description: Short occured error summary
+          traceback:
+            type: string
+            description: Full occured error summary
+  200:
+      description: Access token for user intercation
+      schema:
+        properties:
+          status:
+            type: integer
+            description: Status code
+          question_token:
+            type: string
+            description: The created user token
+          question:
+            type: string
+            description: The known language phrase
+          answer:
+            type: string
+            description: The target language phrase

@@ -186,7 +186,7 @@ class SessionController:
         else:
             phrases_id = db.session.query(Phrase.id).distinct()
 
-        # normalize pair
+        # RL WORKS HERE
         phrase_id = int(np.random.choice([r.id for r in phrases_id]))
 
         flang = str(
