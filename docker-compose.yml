@@ -12,6 +12,23 @@ services:
           - ./backend:/backend
         ports:
           - 6767:6767
+          - 6769:6769
+        network_mode: host
+        command: python app.py
+
+    rl_module:
+        build:
+          context: ./rl_module
+          dockerfile: Dockerfile
+        image: langflow_rl:v0.1
+        container_name: langflow_application_rl
+        depends_on:
+          - backend
+        volumes:
+          - ./rl_module:/rl_module
+        ports:
+          - 6767:6767
+          - 6768:6768
         network_mode: host
         command: python app.py
 

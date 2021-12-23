@@ -6,12 +6,17 @@ from collections import Counter
 from typing import Tuple
 from sqlalchemy import and_, or_, not_
 
+import json
+import requests
+
 from dbase import db
 from dbase.users import UserAuthorized, UserAnon
 from dbase.actions import Action
 from dbase.phrases import Phrase
 
 N_MAX_USERS = 25
+
+RL_SERVICE_URL = "http://localhost:6768/get_pair"
 
 
 def generate_random_token(type: str) -> str:
@@ -187,7 +192,21 @@ class SessionController:
             phrases_id = db.session.query(Phrase.id).distinct()
 
         # RL WORKS HERE
-        phrase_id = int(np.random.choice([r.id for r in phrases_id]))
+        # phrase_id = int(np.random.choice([r.id for r in phrases_id]))
+        response = json.loads(
+            requests.post(
+                RL_SERVICE_URL,
+                json={
+                    "level": level,
+                    "second_language": second_language,
+                    "uuid": uuid,
+                },
+            ).text
+        )
+        phrase_id = int(response["phrase_id"])
+
+        # if phrase_id not in [r.id for r in phrases_id]:
+        #     raise ValueError(f"Wrong phrase id: {phrases_id}")
 
         flang = str(
             db.session.query(getattr(Phrase, first_language))

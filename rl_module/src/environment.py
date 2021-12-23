@@ -1,5 +1,8 @@
 import numpy as np
+import pandas as pd
 from typing import Tuple
+
+from src.database_connector import DatabaseConnector
 
 
 class QuestionSpaceEnv:
@@ -29,14 +32,13 @@ class QuestionSpaceEnv:
         Defined number of iteration and early stopped
     """
 
-    def __init__(self, db):
-        self.transition_success_table = pd.read_sql(
-            "SELECT * FROM transition_success", self.db.engine
-        )
-        self.actions_table = pd.read_sql("SELECT * FROM actions", self.db.engine)
+    def __init__(self):
+        self.db = DatabaseConnector("langflow", "postgres", 123456, "localhost", 5432)
 
+        self.transition_success_table = pd.read_sql(
+            f"SELECT * FROM transition_success", self.db.engine
+        )
         self.n_questions_to_consider = 5
-        self.states = set([tr[0] for tr in self.shift_vectores_matrix])
 
     def get_user_state(self, uuid):
         """
@@ -47,8 +49,28 @@ class QuestionSpaceEnv:
         :return: list of probs for each next phrase and id of phrase.
                  [(phrase_id1, prob1), (phrase_id2, prob2)]
         """
+        user_actions_table = pd.read_sql(
+            f"SELECT * FROM actions WHERE uuid = '{uuid}' ORDER BY action_date DESC LIMIT 5",
+            self.db.engine,
+        )
+        if not user_actions_table.shape[0]:
+            relevant_table = self.transition_success_table
+        else:
+            last_phrase_id = user_actions_table["phrase_id"].iloc[0]
 
-        return  # TODO
+            relevant_table = self.transition_success_table[
+                self.transition_success_table.phrase_from == last_phrase_id
+            ]
+
+        possible_states_phrases = relevant_table["phrase_to"].to_list()
+        possible_states_probs = relevant_table["average_success"].to_list()
+
+        state = [
+            (phrase, prob)
+            for phrase, prob in zip(possible_states_phrases, possible_states_probs)
+        ]
+
+        return state
 
     def step(self, action: int) -> Tuple[list, float, bool, dict]:
         """
@@ -59,11 +81,10 @@ class QuestionSpaceEnv:
         :return: The tuple with parameters -
                  next state, reward, transition success status (done), transition info.
         """
-        # TODO
+        phrase_id, reward, done, info = action, None, None, None
+        return action
 
-        return  # TODO self.state, reward, done, {}
-
-    def reset(self, seed: int = None) -> list[float]:
+    def reset(self, seed: int = None):
         """
         Reset state setting a new one randomly
 
