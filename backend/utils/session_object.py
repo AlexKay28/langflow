@@ -16,7 +16,7 @@ from dbase.phrases import Phrase
 
 N_MAX_USERS = 25
 
-RL_SERVICE_URL = "http://localhost:6768/get_pair"
+RL_SERVICE_URL = os.environ.get("RL_SERVICE_URL")
 
 
 def generate_random_token(type: str) -> str:
@@ -195,7 +195,7 @@ class SessionController:
         # phrase_id = int(np.random.choice([r.id for r in phrases_id]))
         response = json.loads(
             requests.post(
-                RL_SERVICE_URL,
+                RL_SERVICE_URL + "/get_pair",
                 json={
                     "level": level,
                     "second_language": second_language,

@@ -13,6 +13,12 @@ from dbase.transitions import TransitionSuccess, TransitionShift
 
 from utils.comparing import get_phrase_shift_vector
 
+POSTGRES_NAME = os.environ.get("POSTGRES_NAME")
+POSTGRES_USERNAME = os.environ.get("POSTGRES_USERNAME")
+POSTGRES_PASSWORD = os.environ.get("POSTGRES_PASSWORD")
+POSTGRES_HOST = os.environ.get("POSTGRES_HOST")
+POSTGRES_PORT = os.environ.get("POSTGRES_PORT")
+
 
 class DbController:
     """
@@ -21,7 +27,11 @@ class DbController:
 
     def __init__(self):
         self.dbconnector = DatabaseConnector(
-            "langflow", "postgres", 123456, "localhost", 5432
+            POSTGRES_NAME,
+            POSTGRES_USERNAME,
+            POSTGRES_PASSWORD,
+            POSTGRES_HOST,
+            POSTGRES_PORT,
         )
 
     def upload_phrases_to_db(self, dataframe: pd.DataFrame):

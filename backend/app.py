@@ -4,6 +4,10 @@ from flask import Flask
 from flask_cors import CORS
 from flasgger import Swagger
 
+from dotenv import load_dotenv
+
+load_dotenv(".env")
+
 from api import api
 from dbase import db
 
