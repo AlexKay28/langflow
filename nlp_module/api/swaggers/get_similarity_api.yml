@@ -1,0 +1,50 @@
+Utilize NLP approach to compare phrases similarity.
+---
+description: Internal service
+consumes:
+- "application/json"
+produces:
+- "application/json"
+parameters:
+  - in: body
+    name: body_params
+    required: true
+    schema:
+      properties:
+        language:
+          type: string
+          description: The current language to compare
+        phrase1:
+          type: string
+          description: Phrase 1
+        phrase2:
+          type: string
+          description: Phrase 2
+
+responses:
+  500:
+      description: The error on the server side
+      schema:
+        properties:
+          status:
+            type: integer
+            description: Status code
+          message:
+            type: string
+            description: Short occured error summary
+          traceback:
+            type: string
+            description: Full occured error summary
+  200:
+      description: Access token for user intercation
+      schema:
+        properties:
+          status:
+            type: integer
+            description: Status code
+          is_equal:
+            type: boolean
+            description: The equal binary answer
+          equality_rate:
+            type: string
+            description: Equality rate

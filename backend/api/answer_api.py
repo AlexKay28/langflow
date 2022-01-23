@@ -1,11 +1,10 @@
 import json
 import traceback
 
-from utils.tips import show_differences
-from utils.comparing import compare_answers
-
 from flask import request, jsonify
 from flasgger.utils import swag_from
+
+from utils.tips import show_differences
 
 from . import api, session, db_controller
 
@@ -29,7 +28,7 @@ def answer_api():
         flang, flang_phrase, slang, slang_phrase = session.get_user_phrases(uuid, quid)
 
         # apply models to compare answer and get inference
-        comparing_result = compare_answers(slang, slang_phrase, user_answer)
+        comparing_result = session.compare_answers(slang, slang_phrase, user_answer)
         is_equal = comparing_result["is_equal"]
         score = comparing_result["equality_rate"]
 

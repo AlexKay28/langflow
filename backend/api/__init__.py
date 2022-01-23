@@ -1,3 +1,4 @@
+import json
 from flask import Blueprint
 
 from utils.session_object import SessionController
@@ -7,6 +8,19 @@ session = SessionController()
 db_controller = DbController()
 
 api = Blueprint("api", __name__)
+
+
+@api.after_request
+def after(response):
+    # todo with response
+    r = response.get_json()
+    if r and r["status"] != 200:
+        print("=" * 30, end="\n\n")
+        print("Status code:", r["status"])
+        print(r["traceback"])
+        print("=" * 30)
+    return response
+
 
 from .authorization_api import authorization_api
 from .login_api import login_api

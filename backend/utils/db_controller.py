@@ -11,7 +11,7 @@ from dbase.database_connector import DatabaseConnector
 from dbase.actions import Action
 from dbase.transitions import TransitionSuccess, TransitionShift
 
-from utils.comparing import get_phrase_shift_vector
+# from utils.comparing import get_phrase_shift_vector
 
 POSTGRES_NAME = os.environ.get("POSTGRES_NAME")
 POSTGRES_USERNAME = os.environ.get("POSTGRES_USERNAME")
@@ -214,8 +214,12 @@ class DbController:
             )
             .filter(Action.uuid == uuid)
             .order_by(desc(Action.action_date))
-            .limit(2)
+            .limit(3)
         ]
+        print(actions)
+
+        if len(actions) < 2:
+            return
 
         # get previous & current question ids, score
         previous_phrase_id = actions[1]["phrase_id"]
