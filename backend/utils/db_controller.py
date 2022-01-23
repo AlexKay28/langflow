@@ -214,7 +214,7 @@ class DbController:
             )
             .filter(Action.uuid == uuid)
             .order_by(desc(Action.action_date))
-            .limit(3)
+            .limit(2)
         ]
         print(actions)
 

@@ -3,8 +3,6 @@ backports.entry-points-selectable==1.1.0
 click==8.0.1
 colorama==0.4.4
 distlib==0.3.3
-gensim==3.8.3
-compress-fasttext==0.0.7
 filelock==3.3.0
 Flask==2.0.1
 Flask-Cors==3.0.10
@@ -35,7 +33,6 @@ tox==3.24.4
 typing-extensions==3.10.0.2
 virtualenv==20.8.1
 Werkzeug==2.0.1
-zipp==3.5.0
 psycopg2==2.7.7
 flasgger==0.9.5
 requests==2.24.0
