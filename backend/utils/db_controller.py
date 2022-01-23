@@ -1,4 +1,5 @@
 import os
+import sys
 import numpy as np
 import pandas as pd
 import itertools
@@ -42,7 +43,6 @@ class DbController:
 
         :param dataframe: pandas dataframe to upload to base
         """
-
         # check needed columns
         assert all(
             [
@@ -62,6 +62,7 @@ class DbController:
         for idx_from, idx_to in itertools.combinations(range(dataframe.shape[0]), 2):
             if idx_from == idx_to:
                 continue
+
             phrases_from = dataframe.iloc[idx_from]
             phrases_to = dataframe.iloc[idx_to]
             for language in ["english", "russian", "ukrainian", "french"]:
@@ -71,7 +72,7 @@ class DbController:
 
                 # calculate shift vector = n ^ 2 vecs
                 shift_vector = np.array(
-                    []
+                    [0, 0, 0]
                 )  # get_phrase_shift_vector(language, phrase_from, phrase_to)
 
                 transition_shift_table = transition_shift_table.append(

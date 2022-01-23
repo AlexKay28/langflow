@@ -1,6 +1,6 @@
 import numpy as np
 
-EXPLORATION_RATE = 0.3
+EXPLORATION_RATE = 0.5
 
 
 class Agent:
