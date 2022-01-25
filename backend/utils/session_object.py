@@ -16,8 +16,16 @@ from dbase.phrases import Phrase
 
 from utils.facade_api import FacadeAPI
 
+# max user limit
 N_MAX_USERS = 25
-facade_api = FacadeAPI()
+
+# set other services connection
+RL_SERVICE_URL = os.environ.get("RL_SERVICE_URL")
+NLP_SERVICE_URL = os.environ.get("NLP_SERVICE_URL")
+facade_api = FacadeAPI(
+    rl_url=RL_SERVICE_URL,
+    nlp_url=NLP_SERVICE_URL,
+)
 
 
 def generate_random_token(type: str) -> str:
