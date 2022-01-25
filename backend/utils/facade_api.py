@@ -2,7 +2,7 @@ import os
 import json
 import requests
 
-from typing import Tuple
+from typing import Tuple, Dict
 
 
 class RL:
@@ -66,11 +66,11 @@ class FacadeAPI:
         self.rl_service = RL(rl_url)
         self.nlp_service = NLP(nlp_url)
 
-    def rl_get_pair(self, level: int, second_language: str, uuid: str):
+    def rl_get_pair(self, level: int, second_language: str, uuid: str) -> Dict:
         phrase_id = self.rl_service.get_pair(level, second_language, uuid)
         return {"phrase_id": phrase_id}
 
-    def nlp_get_similarity(self, language: str, phrase1: str, phrase2: str):
+    def nlp_get_similarity(self, language: str, phrase1: str, phrase2: str) -> Dict:
         is_equal, equality_rate = self.nlp_service.get_similarity(
             language, phrase1, phrase2
         )
