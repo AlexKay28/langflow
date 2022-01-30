@@ -127,7 +127,7 @@ def compare_answers(language, real_answer: str, user_answer: str) -> bool:
     # filter obviously wrong answers
     inequality_rate = 0.5
     if (
-        levenshtein_distance(real_answer, user_answer) / len(user_answer)
+        levenshtein_distance(real_answer, user_answer) / (len(user_answer) + 1.0)
         > inequality_rate
     ):
         equality_rate = 0.0
