@@ -9,6 +9,7 @@ virtualenv==20.8.1
 flasgger==0.9.5
 python-dotenv==0.19.1
 compress-fasttext==0.0.7
+python-Levenshtein==0.12.2
 
 pytest==6.2.5
 pytest-flask==1.2.0

@@ -32,11 +32,13 @@ def answer_api():
         is_equal = comparing_result["is_equal"]
         score = comparing_result["equality_rate"]
 
-        # records users success/fail in his metadata
-        session.record_users_result(uuid, quid, user_answer, score)
+        # check score is not 0.0 (inadequate aswer assumption)
+        if score:
+            # records users success/fail in his metadata
+            session.record_users_result(uuid, quid, user_answer, score)
 
-        # update transition matrics on the fly
-        db_controller.update_transitions(slang, uuid)
+            # update transition matrics on the fly
+            db_controller.update_transitions(slang, uuid)
 
         # generate tips for user
         differences = ""

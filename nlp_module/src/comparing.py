@@ -4,6 +4,7 @@ import shutil
 import gensim
 import numpy as np
 from scipy.spatial.distance import cosine
+from Levenshtein import distance as levenshtein_distance
 
 from typing import List
 
@@ -123,11 +124,16 @@ def compare_answers(language, real_answer: str, user_answer: str) -> bool:
 
     :return: calculated inference about answer correctness
     """
-    language_model = load_language_model(language)
-    real_answer = normalize_form_of_answer(real_answer)
-    user_answer = normalize_form_of_answer(user_answer)
+    # filter obviously wrong answers
+    if levenshtein_distance(real_answer, user_answer) / len(user_answer) > 0.5:
+        equality_rate = 0.0
+    # apply nlp tech
+    else:
+        language_model = load_language_model(language)
+        real_answer = normalize_form_of_answer(real_answer)
+        user_answer = normalize_form_of_answer(user_answer)
+        equality_rate = get_equality_rate(language_model, real_answer, user_answer)
 
-    equality_rate = get_equality_rate(language_model, real_answer, user_answer)
     is_equal = 1 if equality_rate >= CORRECTNESS_RATE else 0
 
     comparing_result = {
