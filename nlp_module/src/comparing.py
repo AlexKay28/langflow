@@ -125,7 +125,11 @@ def compare_answers(language, real_answer: str, user_answer: str) -> bool:
     :return: calculated inference about answer correctness
     """
     # filter obviously wrong answers
-    if levenshtein_distance(real_answer, user_answer) / len(user_answer) > 0.5:
+    inequality_rate = 0.5
+    if (
+        levenshtein_distance(real_answer, user_answer) / len(user_answer)
+        > inequality_rate
+    ):
         equality_rate = 0.0
     # apply nlp tech
     else:
