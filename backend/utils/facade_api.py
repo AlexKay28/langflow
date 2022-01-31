@@ -27,7 +27,7 @@ class RL:
             ).text
         )
         if response["status"] == 200:
-            return response["phrase_id"]
+            return {"phrase_id": response["phrase_id"]}
 
         raise Exception(response["traceback"])
 
@@ -56,7 +56,11 @@ class NLP:
             ).text
         )
         if response["status"] == 200:
-            return response["is_equal"], response["equality_rate"]
+            return {
+                "is_equal": response["is_equal"],
+                "equality_rate": response["equality_rate"],
+                "differences": response["differences"],
+            }
 
         raise Exception(response["traceback"])
 
@@ -67,11 +71,7 @@ class FacadeAPI:
         self.nlp_service = NLP(nlp_url)
 
     def rl_get_pair(self, level: int, second_language: str, uuid: str) -> Dict:
-        phrase_id = self.rl_service.get_pair(level, second_language, uuid)
-        return {"phrase_id": phrase_id}
+        return self.rl_service.get_pair(level, second_language, uuid)
 
     def nlp_get_similarity(self, language: str, phrase1: str, phrase2: str) -> Dict:
-        is_equal, equality_rate = self.nlp_service.get_similarity(
-            language, phrase1, phrase2
-        )
-        return {"is_equal": is_equal, "equality_rate": equality_rate}
+        return self.nlp_service.get_similarity(language, phrase1, phrase2)

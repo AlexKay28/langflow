@@ -4,8 +4,6 @@ import traceback
 from flask import request, jsonify
 from flasgger.utils import swag_from
 
-from utils.tips import show_differences
-
 from . import api, session, db_controller
 
 
@@ -31,19 +29,14 @@ def answer_api():
         comparing_result = session.compare_answers(slang, slang_phrase, user_answer)
         is_equal = comparing_result["is_equal"]
         score = comparing_result["equality_rate"]
+        differences = comparing_result["differences"]
 
         # check score is not 0.0 (inadequate aswer assumption)
         if score:
             # records users success/fail in his metadata
             session.record_users_result(uuid, quid, user_answer, score)
-
             # update transition matrics on the fly
             db_controller.update_transitions(slang, uuid)
-
-        # generate tips for user
-        differences = ""
-        if not is_equal:
-            differences = show_differences(slang_phrase, user_answer)
 
         return jsonify(
             {

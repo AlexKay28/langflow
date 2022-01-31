@@ -4,7 +4,7 @@ import traceback
 from flask import request, jsonify
 from flasgger.utils import swag_from
 
-from . import api, compare_answers
+from . import api, compare_answers, show_differences
 
 
 @api.route("/get_similarity", methods=["GET"])
@@ -21,11 +21,17 @@ def get_similarity():
         is_equal = comparing_result["is_equal"]
         equality_rate = comparing_result["equality_rate"]
 
+        # generate tips for user
+        differences = ""
+        if not is_equal:
+            differences = show_differences(phrase1, phrase2)
+
         return jsonify(
             {
                 "status": 200,
                 "is_equal": is_equal,
                 "equality_rate": equality_rate,
+                "differences": differences,
             }
         )
     except Exception as e:

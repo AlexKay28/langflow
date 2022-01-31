@@ -48,3 +48,6 @@ responses:
           equality_rate:
             type: string
             description: Equality rate
+          differences:
+            type: strin
+            description: Difference between user answer and real answer (tip)
