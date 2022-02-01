@@ -4,7 +4,7 @@ import shutil
 import gensim
 import numpy as np
 from scipy.spatial.distance import cosine
-from Levenshtein import distance as levenshtein_distance
+from Levenshtein import jaro_winkler
 
 from typing import List
 
@@ -124,14 +124,13 @@ def compare_answers(language, real_answer: str, user_answer: str) -> bool:
 
     :return: calculated inference about answer correctness
     """
-    # filter obviously wrong answers
-    inequality_rate = 0.5
-    if (
-        levenshtein_distance(real_answer, user_answer) / max(len(user_answer), 1)
-        > inequality_rate
-    ):
+    prefix_weight = 0.05
+    first_score = jaro_winkler(real_answer, user_answer, prefix_weight)
+
+    if first_score < 0.5:
         equality_rate = 0.0
-    # apply nlp tech
+    elif first_score < 0.70:
+        equality_rate = first_score
     else:
         language_model = load_language_model(language)
         real_answer = normalize_form_of_answer(real_answer)

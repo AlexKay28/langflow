@@ -28,7 +28,7 @@ def upload_phrases():
         # TODO: check uuid belongs to admin
 
         # work with provided file
-        phrases = pd.read_csv(phrases_file).sample(100)  # too long simetimes
+        phrases = pd.read_csv(phrases_file)
         db_controller.upload_phrases_to_db(phrases)
 
         message = "phrases uploaded!"

@@ -58,8 +58,16 @@ class DbController:
         # create transition success table
         transition_success_table = pd.DataFrame()
 
+        # restricted number of permutations
+        iterators = []
+        number_of_connected_phrases = 20
+        for d in np.array_split(
+            dataframe, dataframe.shape[0] // number_of_connected_phrases
+        ):
+            iterators.append(itertools.permutations(d.index, 2))
+
         transition_id = 0
-        for idx_from, idx_to in itertools.combinations(range(dataframe.shape[0]), 2):
+        for idx_from, idx_to in itertools.chain(*iterators):
             if idx_from == idx_to:
                 continue
 
@@ -72,8 +80,8 @@ class DbController:
 
                 # calculate shift vector = n ^ 2 vecs
                 shift_vector = np.array(
-                    [0, 0, 0]
-                )  # get_phrase_shift_vector(language, phrase_from, phrase_to)
+                    [0]
+                )  # TODO: get_phrase_shift_vector(language, phrase_from, phrase_to)
 
                 transition_shift_table = transition_shift_table.append(
                     {
@@ -92,14 +100,6 @@ class DbController:
                             "n_updates": 1,
                             "phrase_from": idx_from + 1,
                             "phrase_to": idx_to + 1,
-                            "average_success": 1.0,
-                        },
-                        {
-                            "language": language,
-                            "user_group": 0,
-                            "n_updates": 1,
-                            "phrase_from": idx_to + 1,
-                            "phrase_to": idx_from + 1,
                             "average_success": 1.0,
                         },
                     ],
@@ -217,7 +217,6 @@ class DbController:
             .order_by(desc(Action.action_date))
             .limit(2)
         ]
-        print(actions)
 
         if len(actions) < 2:
             return
@@ -239,6 +238,12 @@ class DbController:
             )
             .scalar()
         )
+
+        if not n_updates:
+            # pure phrase pair. no connection
+            # nothing top update
+            return
+
         average = (
             db.session.query(TransitionSuccess.average_success)
             .filter(

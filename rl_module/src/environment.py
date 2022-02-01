@@ -49,18 +49,20 @@ class QuestionSpaceEnv:
         :return: list of probs for each next phrase and id of phrase.
                  [(phrase_id1, prob1), (phrase_id2, prob2)]
         """
+        n_previous = 10
         user_actions_table = pd.read_sql(
-            f"SELECT * FROM actions WHERE uuid = '{uuid}' ORDER BY action_date DESC LIMIT 5",
+            f"SELECT * FROM actions WHERE uuid = '{uuid}' ORDER BY action_date DESC LIMIT {n_previous}",
             self.db.engine,
         )
         if not user_actions_table.shape[0]:
             relevant_table = self.transition_success_table
         else:
             last_phrase_id = user_actions_table["phrase_id"].iloc[0]
-
-            relevant_table = self.transition_success_table[
-                self.transition_success_table.phrase_from == last_phrase_id
-            ]
+            # TODO: build connections between chunks
+            # relevant_table = self.transition_success_table[
+            #     self.transition_success_table.phrase_from == last_phrase_id
+            # ]
+            relevant_table = self.transition_success_table
 
         possible_states_phrases = relevant_table["phrase_to"].to_list()
         possible_states_probs = relevant_table["average_success"].to_list()
