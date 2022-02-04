@@ -57,7 +57,6 @@ const useStyles = makeStyles({
 const LoginPage = (props) => {
     const [username, setUsername] = useState('')
     const [password, setPassword] = useState('')
-    const [loading, setLoading] = useState(false)
     const classes = useStyles()
 
     const { isLoggedIn } = useSelector(state => state.auth)
@@ -77,16 +76,7 @@ const LoginPage = (props) => {
     const handleLogin = (e) => {
         e.preventDefault()
 
-        setLoading(true)
-
         dispatch(login(username, password))
-            .then(() => {
-                props.history.push("/home")
-                window.location.reload()
-            })
-            .catch(() => {
-                setLoading(false)
-            })
     }
 
     if (isLoggedIn) {

@@ -1,6 +1,6 @@
 import './header.scss'
 
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { NavLink } from 'react-router-dom'
 
 import Navbar from 'react-bootstrap/Navbar'
@@ -9,10 +9,12 @@ import Container from 'react-bootstrap/Container'
 import logo from '../../images/logo.png'
 
 import { logout } from '../actions/auth'
+import { RootState } from '../store'
 
 const Header = (): JSX.Element => {
     const dispatch = useDispatch()
-    const loggedIn = localStorage.getItem('user')
+
+    const { isLoggedIn } = useSelector((state: RootState) => state.auth)
 
     const logOut = () => {
         dispatch(logout())
@@ -33,7 +35,7 @@ const Header = (): JSX.Element => {
                 <Nav className="header_nav-links">
                     <NavLink className="header_nav-link" activeClassName="header_nav-link-active" to="/home">Home</NavLink>
                     <NavLink className="header_nav-link" activeClassName="header_nav-link-active" to="/ourteam">Our team</NavLink>
-                    {!loggedIn ? 
+                    {!isLoggedIn ? 
                     <>
                         <NavLink className="header_nav-link" activeClassName="header_nav-link-active" to="/login">Sign in</NavLink>
                         <NavLink className="header_nav-link" activeClassName="header_nav-link-active" to="/registration">Sign up</NavLink>

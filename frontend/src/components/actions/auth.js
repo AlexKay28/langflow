@@ -6,6 +6,8 @@ import {
     LOGOUT,
     SET_MESSAGE
   } from './types'
+
+  import {NotificationManager} from 'react-notifications'
   
   import AuthService from '../services/auth.service'
   
@@ -20,6 +22,8 @@ import {
           type: SET_MESSAGE,
           payload: response.data.message,
         })
+
+        NotificationManager.success(response.data.message)
   
         return Promise.resolve();
       },
@@ -39,6 +43,8 @@ import {
           type: SET_MESSAGE,
           payload: message,
         })
+
+        NotificationManager.error(message)
   
         return Promise.reject();
       }
@@ -52,6 +58,8 @@ import {
           type: LOGIN_SUCCESS,
           payload: { user: data },
         })
+
+        NotificationManager.success('Successfull logging')
   
         return Promise.resolve();
       },
@@ -71,6 +79,8 @@ import {
           type: SET_MESSAGE,
           payload: message,
         })
+
+        NotificationManager.error(message)
   
         return Promise.reject()
       }

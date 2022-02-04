@@ -58,7 +58,6 @@ const RegistrationPage = (props) => {
     const [username, setUsername] = useState('')
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
-    const [successful, setSuccessful] = useState(false)
     const classes = useStyles()
     const dispatch = useDispatch()
 
@@ -80,16 +79,15 @@ const RegistrationPage = (props) => {
     const handleRegister = (e) => {
         e.preventDefault()
 
-        setSuccessful(false)
 
         dispatch(register(username, email, password))
             .then(() => {
                 props.history.push('/login')
-                setSuccessful(true)
             })
-            .catch(() => {
-                setSuccessful(false)
+            .catch((err) => {
+                console.log(err);
             })
+        
     }
 
     return (
