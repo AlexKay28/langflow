@@ -85,7 +85,7 @@ const RegistrationPage = (props) => {
                 props.history.push('/login')
             })
             .catch((err) => {
-                console.log(err);
+                console.error(err);
             })
         
     }
