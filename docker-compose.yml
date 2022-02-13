@@ -12,8 +12,9 @@ services:
           - ./backend:/backend
         ports:
           - 6767:6767
-          - 6769:6769
-        network_mode: host
+        networks:
+          lfnet:
+            ipv4_address: 10.192.1.21
         command: python -u app.py
 
     rl_module:
@@ -27,9 +28,10 @@ services:
         volumes:
           - ./rl_module:/rl_module
         ports:
-          - 6767:6767
           - 6768:6768
-        network_mode: host
+        networks:
+          lfnet:
+            ipv4_address: 10.192.1.22
         command: python -u app.py
 
     nlp_module:
@@ -38,30 +40,31 @@ services:
           dockerfile: Dockerfile
         image: langflow_nlp:v0.1
         container_name: langflow_application_nlp
-        depends_on:
-          - backend
         volumes:
           - ./nlp_module:/nlp_module
         ports:
-          - 6767:6767
           - 6769:6769
-        network_mode: host
+        networks:
+          lfnet:
+            ipv4_address: 10.192.1.23
         command: python -u app.py
 
-    frontend:
-        build:
-          context: ./frontend
-          dockerfile: Dockerfile
-        image: langflow_front:v0.1
-        container_name: langflow_application_front
-        volumes:
-          - ./frontend:/frontend
-          - ./frontend/node_modules
-        ports:
-          - 3000:3000
-        network_mode: host
-        command: npm start
-        restart: unless-stopped
+    # frontend:
+    #     build:
+    #       context: ./frontend
+    #       dockerfile: Dockerfile
+    #     image: langflow_front:v0.1
+    #     container_name: langflow_application_front
+    #     volumes:
+    #       - $PWD/frontend:/frontend
+    #       - $PWD/frontend/node_modules
+    #     ports:
+    #       - 3000:3000
+    #     networks:
+    #       lfnet:
+    #         ipv4_address: 10.192.1.24
+    #     command: npm start
+    #     restart: unless-stopped
 
     postgres:
       image: postgres
@@ -74,8 +77,8 @@ services:
       ports:
         - "5432:5432"
       networks:
-        - postgres-net
-      restart: unless-stopped
+        lfnet:
+          ipv4_address: 10.192.1.10
 
     pgadmin:
       image: dpage/pgadmin4
@@ -90,11 +93,14 @@ services:
       depends_on:
         - postgres
       networks:
-        - postgres-net
+        lfnet:
+          ipv4_address: 10.192.1.11
       logging:
         driver: none
-      restart: unless-stopped
 
 networks:
-  postgres-net:
-    driver: bridge
+  lfnet:
+    ipam:
+      driver: default
+      config:
+        - subnet: 10.192.1.0/24

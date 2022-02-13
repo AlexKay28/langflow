@@ -1,8 +1,15 @@
+import os
 import numpy as np
 import pandas as pd
 from typing import Tuple
 
 from src.database_connector import DatabaseConnector
+
+POSTGRES_NAME = os.getenv('POSTGRES_NAME', "langflow")
+POSTGRES_USERNAME = os.getenv('POSTGRES_USERNAME', "postgres")
+POSTGRES_PASSWORD = os.getenv('POSTGRES_PASSWORD', "123456")
+POSTGRES_HOST = os.getenv('POSTGRES_HOST', "localhost")
+POSTGRES_PORT = os.getenv('POSTGRES_PORT', "5432")
 
 
 class QuestionSpaceEnv:
@@ -33,7 +40,13 @@ class QuestionSpaceEnv:
     """
 
     def __init__(self):
-        self.db = DatabaseConnector("langflow", "postgres", 123456, "localhost", 5432)
+        self.db = DatabaseConnector(
+            POSTGRES_NAME,
+            POSTGRES_USERNAME,
+            POSTGRES_PASSWORD,
+            POSTGRES_HOST,
+            POSTGRES_PORT,
+        )
 
         self.transition_success_table = pd.read_sql(
             f"SELECT * FROM transition_success", self.db.engine

@@ -10,4 +10,4 @@ app.register_blueprint(api)
 Swagger(app)
 
 if __name__ == "__main__":
-    app.run(host="localhost", port=6769, debug=True)
+    app.run(host="0.0.0.0", port=6769, debug=True)
