@@ -49,22 +49,18 @@ services:
             ipv4_address: 10.192.1.23
         command: python -u app.py
 
-    # frontend:
-    #     build:
-    #       context: ./frontend
-    #       dockerfile: Dockerfile
-    #     image: langflow_front:v0.1
-    #     container_name: langflow_application_front
-    #     volumes:
-    #       - $PWD/frontend:/frontend
-    #       - $PWD/frontend/node_modules
-    #     ports:
-    #       - 3000:3000
-    #     networks:
-    #       lfnet:
-    #         ipv4_address: 10.192.1.24
-    #     command: npm start
-    #     restart: unless-stopped
+    frontend:
+        build:
+          context: ./frontend
+          dockerfile: Dockerfile
+        image: langflow_front:v0.1
+        container_name: langflow_application_front
+        ports:
+          - 3000:3000
+        networks:
+          lfnet:
+            ipv4_address: 10.192.1.24
+        command: npm start
 
     postgres:
       image: postgres
@@ -75,7 +71,7 @@ services:
       volumes:
          - ./data/postgresql:/var/lib/postgresql/data
       ports:
-        - "5432:5432"
+        - 5432:5432
       networks:
         lfnet:
           ipv4_address: 10.192.1.10
@@ -89,7 +85,7 @@ services:
       volumes:
          - ./data/pgadmin:/var/lib/pgadmin/data
       ports:
-        - "${PGADMIN_PORT:-5050}:80"
+        - 5050:80
       depends_on:
         - postgres
       networks:
