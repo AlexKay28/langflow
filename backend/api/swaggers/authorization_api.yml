@@ -20,7 +20,7 @@ parameters:
         email:
           type: string
           description: The user's email (po4Ta)
-          
+
 responses:
   500:
       description: The error on the server side
@@ -40,6 +40,17 @@ responses:
       description: Access token for user intercation
       schema:
         id: authorization_api_200
+        properties:
+          status:
+            type: integer
+            description: Status code
+          message:
+            type: string
+            description: Message from backend
+  409:
+      description: Username and/or email already exist.
+      schema:
+        id: authorization_api_409
         properties:
           status:
             type: integer

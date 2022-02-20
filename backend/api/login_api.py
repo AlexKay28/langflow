@@ -15,12 +15,12 @@ def login_api():
         username = req["username"]
         password = req["password"]
         is_anon = req["is_anon"]
-        session_token_generated, user_existance = session.activate_session_token(
+        status, session_token_generated = session.activate_session_token(
             username, password, is_anon
         )
         return jsonify(
             {
-                "status": 200,
+                "status": status,
                 "session_token": session_token_generated,
             }
         )

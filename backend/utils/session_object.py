@@ -69,22 +69,25 @@ class SessionController:
     @staticmethod
     def create_user(username: str, password: str, email: bool) -> Tuple[str, bool]:
         """
-        Create new authorized user in base
+        Create new authorized user in base.
 
-        :param username: provided username.
-        :param password: provided password.
-        :param email: user email to contact.
+        :param username: Provided username.
+        :param password: Provided password.
+        :param email: User email to contact.
+
+        :return: Final status code and message.
         """
-
+        # check if the username is already exists
         user = db.session.query(UserAuthorized).filter(
-            and_(
+            or_(
                 UserAuthorized.username == username,
                 UserAuthorized.email == email,
             )
         )
         if user.first() is not None:
-            return f"Username <{username}> and/or email <{email}> already exist"
+            return 409, f"Username <{username}> and/or email <{email}> already exist"
 
+        # create new user
         uuid_generated = generate_random_token("uuid4")
         user = UserAuthorized(
             username=username,
@@ -96,7 +99,7 @@ class SessionController:
         db.session.add(user)
         db.session.commit()
 
-        return f"User <{username}> was created!"
+        return 200, f"User <{username}> was created!"
 
     @staticmethod
     def activate_session_token(
@@ -105,11 +108,11 @@ class SessionController:
         """
         Activate user session
 
-        :param username: provided username.
-        :param password: provided password.
-        :param is_anon: is user work as anonimous user or authorized.
+        :param username: Provided username.
+        :param password: Provided password.
+        :param is_anon: User work as anonimous user or authorized flag.
 
-        :return: tuple of values - generated token and generation status check (str, bool)
+        :return: Tuple of values - status code and generated token.
         """
         session_token_generated = generate_random_token("os_8")
 
@@ -137,7 +140,7 @@ class SessionController:
             else:
                 raise ValueError("Wrong username or password")
 
-        return session_token_generated, "Session token is signed"
+        return 200, session_token_generated
 
     @staticmethod
     def get_user_uuid(session_token: str) -> str:

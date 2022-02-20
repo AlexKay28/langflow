@@ -15,11 +15,13 @@ def authorization_api():
         username = req["username"]
         password = req["password"]
         email = req["email"]
-        result = session.create_user(username, password, email)
+        status, result = session.create_user(username, password, email)
         return jsonify(
             {
-                "status": 200,
+                "status": status,
                 "message": result,
+                # TODO: needed for backend working if code != 200
+                "traceback": f"Traceback is not needed.",
             }
         )
     except Exception as e:
