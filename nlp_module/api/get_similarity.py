@@ -1,3 +1,4 @@
+import os
 import json
 import traceback
 
@@ -6,6 +7,8 @@ from flasgger.utils import swag_from
 
 from . import api, compare_answers, show_differences
 
+INCORRECT_ANSWER_THRESHOLD = float(os.getenv('INCORRECT_ANSWER_THRESHOLD'))
+
 
 @api.route("/get_similarity", methods=["GET"])
 @swag_from("swaggers/get_similarity_api.yml")
@@ -13,25 +16,25 @@ def get_similarity():
     try:
         req = request.get_json()
         language = req["language"]
-        phrase1 = req["phrase1"]
-        phrase2 = req["phrase2"]
+        correct_phrase = req["phrase1"]
+        comparing_phrase = req["phrase2"]
 
         # compare_phrases
-        comparing_result = compare_answers(language, phrase1, phrase2)
+        comparing_result = compare_answers(language, correct_phrase, comparing_phrase)
         is_equal = comparing_result["is_equal"]
         equality_rate = comparing_result["equality_rate"]
 
         # generate tips for user
-        differences = ""
-        if not is_equal:
-            differences = show_differences(phrase1, phrase2)
+        differences = f"{correct_phrase}"
+        if equality_rate > INCORRECT_ANSWER_THRESHOLD:
+            differences = show_differences(correct_phrase, comparing_phrase)
 
         return jsonify(
             {
                 "status": 200,
                 "is_equal": is_equal,
                 "equality_rate": equality_rate,
-                "differences": differences,
+                "differences": "",
             }
         )
     except Exception as e:

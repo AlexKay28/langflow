@@ -1,23 +1,16 @@
-import os
 import difflib
 from colorama import Fore, Style
-
-MISTAKE_TRESHOLD = 5
 
 
 def show_differences(real_answer: str, user_answer: str) -> str:
     """
-    Function shows difference between the users answer and the correct one
+    Function shows difference between the users answer and the correct one.
 
-    :param real_answer: the answer from the base which is ideal for question
-    :param user_answer: the answer from user which should be compared with real_answer
+    :param real_answer: The answer from the base which is ideal for question.
+    :param user_answer: The answer from user which should be compared with real_answer.
+
+    :return: Colored string with correction tips.
     """
-    if (
-        sum([1 for f in difflib.ndiff(real_answer, user_answer) if f[0] != " "])
-        > MISTAKE_TRESHOLD
-    ):
-        return f"{Fore.GREEN}{real_answer}{Style.RESET_ALL}"
-
     fixed_string = ""
     difference_iterator = difflib.ndiff(real_answer, user_answer)
 

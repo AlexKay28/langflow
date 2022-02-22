@@ -3,6 +3,10 @@ import json
 from flask import Flask
 from flasgger import Swagger
 
+from dotenv import load_dotenv
+
+load_dotenv(".env")
+
 from api import api
 
 app = Flask(__name__)

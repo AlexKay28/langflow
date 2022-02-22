@@ -1,14 +1,17 @@
 import os
 import gzip
 import shutil
-import gensim
+import fasttext
 import numpy as np
 from scipy.spatial.distance import cosine
 from Levenshtein import jaro_winkler
 
 from typing import List
 
-CORRECTNESS_RATE = 0.98
+CORRECTNESS_RATE = float(os.getenv('CORRECTNESS_RATE'))
+INCORRECT_ANSWER_THRESHOLD = float(os.getenv('INCORRECT_ANSWER_THRESHOLD'))
+FIRST_MODEL_THRESHOLD = float(os.getenv('FIRST_MODEL_THRESHOLD'))
+
 
 PATH_TO_MODELS = "language_models/"
 
@@ -23,8 +26,9 @@ def load_language_model(model_name: str, extension: str = ".bin"):
     :return: loaded fasttext model
     """
     model_name_ext = f"{model_name}300_quantized.bin"
+    model_name_ext = f"{model_name}.bin"
     model_path = os.path.join(PATH_TO_MODELS, f"{model_name_ext}")
-    return gensim.models.fasttext.FastTextKeyedVectors.load(model_path)
+    return fasttext.load_model(model_path)
 
 
 def normalize_form_of_answer(answer: str) -> str:
@@ -44,19 +48,7 @@ def normalize_form_of_answer(answer: str) -> str:
     return answer
 
 
-def tokenize_answer(answer: str) -> List:
-    """
-    Tokenize sentence
-
-    :param answer: the answer to tokenize
-
-    :return: the list of tokens
-    """
-    tokens = answer.split() if len(answer) > 0 else []
-    return tokens
-
-
-def get_phrase_vector(language_model, phrase_tokens: List) -> np.ndarray:
+def get_phrase_vector(language_model, phrase: str) -> np.ndarray:
     """
     Get phrase vector using language model which provides each
     containing token embedding
@@ -66,7 +58,16 @@ def get_phrase_vector(language_model, phrase_tokens: List) -> np.ndarray:
 
     :return: the numpy array of aggregated vector
     """
-    return language_model[" ".join(phrase_tokens)]
+    # tokenization
+    tokens = phrase.split() if len(phrase) > 0 else []
+
+    # model apply
+    token_vecs = np.array([language_model.get_word_vector(t) for t in tokens])
+
+    # agg vecs
+    phrase_vec = token_vecs.mean(axis=0)
+
+    return phrase_vec
 
 
 def get_similarity(vec1: np.ndarray, vec2: np.ndarray, metric: str = "cosine") -> float:
@@ -89,8 +90,8 @@ def get_phrase_shift_vector(language, phrase1: str, phrase2: str) -> list:
     Get shift vector between phrases.
     """
     language_model = load_language_model(language)
-    phrase1_vec = get_phrase_vector(language_model, tokenize_answer(phrase1))
-    phrase2_vec = get_phrase_vector(language_model, tokenize_answer(phrase2))
+    phrase1_vec = get_phrase_vector(language_model, phrase1)
+    phrase2_vec = get_phrase_vector(language_model, phrase2)
     return phrase2_vec - phrase1_vec
 
 
@@ -105,12 +106,12 @@ def get_equality_rate(language_model, real_answer: str, user_answer: str) -> flo
     """
     if not user_answer:
         return 0.0
-    real_answer_tokens = tokenize_answer(real_answer)
-    user_answer_tokens = tokenize_answer(user_answer)
-    equality_rate = get_similarity(
-        get_phrase_vector(language_model, real_answer_tokens),
-        get_phrase_vector(language_model, user_answer_tokens),
-    )
+
+    v1 = get_phrase_vector(language_model, real_answer)
+    v2 = get_phrase_vector(language_model, user_answer)
+
+    equality_rate = get_similarity(v1, v2)
+
     return equality_rate
 
 
@@ -124,12 +125,15 @@ def compare_answers(language, real_answer: str, user_answer: str) -> bool:
 
     :return: calculated inference about answer correctness
     """
+
+    # calculate fast-perfomance comparing.
     prefix_weight = 0.05
     first_score = jaro_winkler(real_answer, user_answer, prefix_weight)
 
-    if first_score < 0.5:
+    # if first score is obviously low - skip nlp check.
+    if first_score < INCORRECT_ANSWER_THRESHOLD:
         equality_rate = 0.0
-    elif first_score < 0.70:
+    elif first_score < FIRST_MODEL_THRESHOLD:
         equality_rate = first_score
     else:
         language_model = load_language_model(language)
