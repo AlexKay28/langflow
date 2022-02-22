@@ -55,33 +55,36 @@ class QuestionSpaceEnv:
 
     def get_user_state(self, uuid):
         """
-        Find previous user state and select all possible state with their success probs.
+        Find previous user state and select all possible states with their success probs.
 
         :param uuid: user id
 
         :return: list of probs for each next phrase and id of phrase.
                  [(phrase_id1, prob1), (phrase_id2, prob2)]
         """
-        n_previous = 10
-        user_actions_table = pd.read_sql(
-            f"SELECT * FROM actions WHERE uuid = '{uuid}' ORDER BY action_date DESC LIMIT {n_previous}",
-            self.db.engine,
+        n_previous = 15
+
+        query = (
+            f"SELECT * FROM actions WHERE uuid = '{uuid}' "
+            f"ORDER BY action_date DESC LIMIT {n_previous}"
         )
-        if not user_actions_table.shape[0]:
-            relevant_table = self.transition_success_table
-        else:
-            last_phrase_id = user_actions_table["phrase_id"].iloc[0]
-            # TODO: build connections between chunks
-            # relevant_table = self.transition_success_table[
-            #     self.transition_success_table.phrase_from == last_phrase_id
-            # ]
-            relevant_table = self.transition_success_table
+        user_actions_table = pd.read_sql(query, self.db.engine)
+
+        relevant_table = self.transition_success_table
+
+        # n_user_actions = user_actions_table.shape[0]
+        # if n_user_actions > 0:
+        #     last_phrase_id = user_actions_table["phrase_id"].iloc[0]
+        #     # TODO: build connections between chunks
+        #     relevant_table = self.transition_success_table[
+        #         self.transition_success_table.phrase_from == last_phrase_id
+        #     ]
 
         possible_states_phrases = relevant_table["phrase_to"].to_list()
         possible_states_probs = relevant_table["average_success"].to_list()
 
         state = [
-            (phrase, prob)
+            (phrase, 1 - prob)
             for phrase, prob in zip(possible_states_phrases, possible_states_probs)
         ]
 

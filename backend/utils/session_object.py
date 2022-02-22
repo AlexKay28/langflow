@@ -17,7 +17,7 @@ from dbase.phrases import Phrase
 from utils.facade_api import FacadeAPI
 
 # max user limit
-N_MAX_USERS = 25
+N_MAX_USERS = int(os.environ.get("N_MAX_USERS"))
 
 # set other services connection
 RL_SERVICE_URL = os.environ.get("RL_SERVICE_URL")
