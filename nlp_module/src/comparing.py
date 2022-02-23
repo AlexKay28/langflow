@@ -25,7 +25,6 @@ def load_language_model(model_name: str, extension: str = ".bin"):
 
     :return: loaded fasttext model
     """
-    model_name_ext = f"{model_name}300_quantized.bin"
     model_name_ext = f"{model_name}.bin"
     model_path = os.path.join(PATH_TO_MODELS, f"{model_name_ext}")
     return fasttext.load_model(model_path)

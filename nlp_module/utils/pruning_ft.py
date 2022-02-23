@@ -11,7 +11,18 @@ def main(model_path, new_model_path):
     Сombination of feature selection and quantization
     """
     big_model = load_facebook_model(model_path).wv
-    small_model = compress_fasttext.prune_ft_freq(big_model, pq=True)
+
+    small_model = compress_fasttext.prune_ft_freq(
+        big_model,
+        new_vocab_size=100_000,
+        new_ngrams_size=300_000,
+        fp16=True,
+        pq=True,
+        qdim=300,
+        centroids=255,
+        prune_by_norm=True,
+        norm_power=1,
+    )
     small_model.save(new_model_path)
 
 
