@@ -7,7 +7,7 @@ from argparse import ArgumentParser
 # https://gist.github.com/AlexKay28/1f48b00ea355c06c68bcda3b9df1355b
 
 
-def main(model_path, to_size, new_model_path):
+def reduce(model_path, to_size, new_model_path):
     """
     Reduce vectors size in fasttext model
     """
@@ -31,4 +31,4 @@ if __name__ == "__main__":
     parser.add_argument("--new_model_path", default=None, type=str)
 
     args = parser.parse_args()
-    main(args.model_path, args.to_size, args.new_model_path)
+    reduce(args.model_path, args.to_size, args.new_model_path)

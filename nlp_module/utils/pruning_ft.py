@@ -1,12 +1,12 @@
 import compress_fasttext
-from gensim.models.fasttext import load_facebook_model
 from argparse import ArgumentParser
+from gensim.models.fasttext import load_facebook_model
 
 # fasttext v0.9.2
 # https://gist.github.com/AlexKay28/fb0dd8a3db8a3e6e4f2c880c83c296a5
 
 
-def main(model_path, new_model_path):
+def prune(model_path, new_model_path):
     """
     Сombination of feature selection and quantization
     """
@@ -32,4 +32,4 @@ if __name__ == "__main__":
     parser.add_argument("--new_model_path", default=None, type=str)
 
     args = parser.parse_args()
-    main(args.model_path, args.new_model_path)
+    prune(args.model_path, args.new_model_path)

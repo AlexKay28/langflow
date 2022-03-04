@@ -33,14 +33,6 @@ python3 utils/reduce_dim_ft.py \
 Weights and hash-map pruning:
 ```
 python3 utils/pruning_ft.py \
-        --model_path=./language_models/french_orig.bin \
-        --new_model_path=./language_models/french_pruned.bin
-
-python3 utils/pruning_ft.py \
-        --model_path=./language_models/english_orig.bin \
-        --new_model_path=./language_models/english_pruned.bin
-
-python3 utils/pruning_ft.py \
         --model_path=./language_models/ukrainian_orig.bin \
         --new_model_path=./language_models/ukrainian_pruned.bin
 ```
