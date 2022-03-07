@@ -12,6 +12,8 @@ from dbase.database_connector import DatabaseConnector
 from dbase.actions import Action
 from dbase.transitions import TransitionSuccess, TransitionShift
 
+from utils.helpers import get_connected_chunks
+
 # from utils.comparing import get_phrase_shift_vector
 
 POSTGRES_NAME = os.environ.get("POSTGRES_NAME")
@@ -19,6 +21,9 @@ POSTGRES_USERNAME = os.environ.get("POSTGRES_USERNAME")
 POSTGRES_PASSWORD = os.environ.get("POSTGRES_PASSWORD")
 POSTGRES_HOST = os.environ.get("POSTGRES_HOST")
 POSTGRES_PORT = os.environ.get("POSTGRES_PORT")
+
+_TRANSITIONS_CHUNK_SIZE = 15
+_TRANSITIONS_HOOKUPS = _TRANSITIONS_CHUNK_SIZE // 5
 
 
 class DbController:
@@ -58,13 +63,14 @@ class DbController:
         # create transition success table
         transition_success_table = pd.DataFrame()
 
-        # restricted number of permutations
+        # upload transitions with restricted number of permutations
         iterators = []
-        number_of_connected_phrases = 20
-        for d in np.array_split(
-            dataframe, dataframe.shape[0] // number_of_connected_phrases
+        for idxs in get_connected_chunks(
+            dataframe.index,
+            chunk_size=_TRANSITIONS_CHUNK_SIZE,
+            hookups=_TRANSITIONS_HOOKUPS,
         ):
-            iterators.append(itertools.permutations(d.index, 2))
+            iterators.append(itertools.permutations(idxs, 2))
 
         transition_id = 0
         for idx_from, idx_to in itertools.chain(*iterators):
