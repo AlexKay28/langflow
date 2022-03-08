@@ -1,55 +1,41 @@
 
 <p align="center">
-  <img src="https://user-images.githubusercontent.com/55444371/134302141-d272c398-fc11-449b-88e9-ac92823a7b86.png" />
+  <img src="https://user-images.githubusercontent.com/55444371/157264799-d738d44b-e686-4a5b-ab2d-dcd18c30341d.png" width="50%" height="50%">
 </p>
+
 
 *- "The project for the most brutal and effective language learning technique" (c) Alex Kay*
 
-  The langflow project was created especially for language learning by using the most direct way. 
-A method demands to work passionately and regularly. The main idea of the method is constant recall by students writing sentences in language which he would like to improve! 
+  The langflow project was created for language learning purposes on the basis of continuous practicing and deep recall. The idea behind this is the constant repetition and direct experience obtained by the student as well as it leveraged in RL paradigm with agent and learning environment. The natural way of learning by this technique reminds supervised/semi-supervised learning which became one the most effective ways in ML nowadays (one of the assumptions on a user side is used - students already studied grammar and know some vocabulary and can construct simple sentences).
+  
+  List of analogies transfered from RL to student:
+  - environment :: learning phrases space
+  - agent :: student
+  - optimal policy :: successfull learning
+  - exploration :: new phrases, expanding vocabulary
+  - reward :: student's answer correctness rate
 
-  The natural way of learning by this technique reminds supervised learning which became one the most effective ways in ML. Just make the parallel between these both and find this as a way of learning if it is convenient for you!
+# How to
 
-# How to use
+1. On The first page it will prompt the student to choose a pair of languages in a session. The first language should be already known by the student and the second one is the target language student going to learn. Also it's possible to choose the difficulty level at a start, but it might be configured easily later. 
 
-Session running:
-Install python on your computer: *https://www.python.org/*
+<p align="center">
+  <img src="https://user-images.githubusercontent.com/55444371/157267496-14eaa355-c8c3-4691-8833-7df23d3c79e5.png" width="50%" height="50%">
+</p>
 
-Command below will start the stage of setting parameters for your new session:
-`python3 main.py` 
+Take into account the fact that it doesn't require to do registrations which can be convenient while the first try, but if you want to score your own progress and to have individual progress control by RL algo - you must be authorized while learning.
 
-In the beginning, you will be asked to choose your first language (language you already know) and second language (language you are going to improve). Also, you will be asked to choose a level. just follow instructions:
+2. The learning process has shown in the picture below:
 
-```
-    Hello! Choose language pair you want to learn!
-    Among next available languages:
-    {1: 'english', 2: 'russian', 3: 'french'}
+<p align="center">
+  <img src="https://user-images.githubusercontent.com/55444371/157269220-0c0ff490-d976-455a-ae15-d3ad0691042f.png" width="50%" height="50%">
+</p>
 
-    and starting level:
-    {1: 'level1'}
-    
-First language id : 1
-Second language id: 3
-Level id: 1
-```
+Each step has 3 lines in the step block, it's the student's direct experience he/she should to analyze and do inferences, take notes and memorize. The first line of the block is the question that was asked, the second one is the provided by the student answer, the third line is the correct answer given by the app. 
+Comparing student and real answers from questions NLP model is used to calculate semantic score of closeness. 
+The best value possible is equal to 1.0, the worst-case is equal to 0.0. (Don't worry if you cant get the best score, consider 0.95 as a perfect answer you can give)
 
-After choosing the settings of your session here you go!
-You will be asked to translate the sentence into a second language. 
-Don't be confused about constant writing, this is part of the idea of learning!
-
-The two possible cases are represented below! 
-```
-Cool! You have choosed: [english-french]
-Phrase #1            >> I don't watch such kinds of movies
-Translate            >> Je ne regarde pas de tels types de films
-Right answer!       
-
-Phrase #2            >> This is our city
-Translate            >> C'est notre vile
-Bad answer           >> C'est notre ville
-Repeat please        >> C'est notre ville
-Well!                >> C'est notre ville
-```
+Constant practicing, day by day, allows you to master your language skills, improve your active vocabulary and help you be closer to your dreams to speak freely.
 
 # Online version
 https://langflow1.herokuapp.com/
