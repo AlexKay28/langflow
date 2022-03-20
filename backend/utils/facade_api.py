@@ -11,7 +11,7 @@ class RL:
     def __init__(self, service_url: str):
         self.url = service_url
 
-    def get_pair(self, level: int, second_language: str, uuid: str) -> int:
+    def get_pair(self, level: int, second_language: str, uuid: str) -> Dict:
         """
         Return response with new phrase id.
         """
@@ -38,9 +38,7 @@ class NLP:
     def __init__(self, service_url: str):
         self.url = service_url
 
-    def get_similarity(
-        self, language: str, phrase1: str, phrase2: str
-    ) -> Tuple[bool, float]:
+    def get_similarity(self, language: str, phrase1: str, phrase2: str) -> Dict:
         """
         Return response with new phrase id.
         """
@@ -64,6 +62,26 @@ class NLP:
 
         raise Exception(response["traceback"])
 
+    def get_phrase_vector(self, language: str, phrase: str) -> Dict:
+        """
+        Return response with new phrase id.
+        """
+        endpoint = "/get_phrase_vector"
+        response = json.loads(
+            requests.get(
+                self.url + endpoint,
+                json={
+                    "language": language,
+                    "phrase": phrase,
+                },
+            ).text
+        )
+        vector = [float(f) for f in response["vector"][1:-1].split()]
+        if response["status"] == 200:
+            return {"vector": vector}
+
+        raise Exception(response["traceback"])
+
 
 class FacadeAPI:
     def __init__(self, rl_url: str = None, nlp_url: str = None):
@@ -75,3 +93,6 @@ class FacadeAPI:
 
     def nlp_get_similarity(self, language: str, phrase1: str, phrase2: str) -> Dict:
         return self.nlp_service.get_similarity(language, phrase1, phrase2)
+
+    def nlp_get_phrase_vector(self, language: str, phrase: str) -> Dict:
+        return self.nlp_service.get_phrase_vector(language, phrase)

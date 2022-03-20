@@ -4,7 +4,7 @@ from scipy.spatial import distance
 from Levenshtein import jaro_winkler
 
 from src.preprocessing import normalize_text
-from src.vectorize import _load_language_model, get_phrase_vector
+from src.vectorize import get_phrase_vector
 
 CORRECTNESS_RATE = float(os.getenv('CORRECTNESS_RATE'))
 INCORRECT_ANSWER_THRESHOLD = float(os.getenv('INCORRECT_ANSWER_THRESHOLD'))
@@ -39,9 +39,8 @@ def get_phrase_shift_vector(language: str, phrase1: str, phrase2: str) -> list:
     """
     Get shift vector between phrases.
     """
-    language_model = _load_language_model(language)
-    phrase1_vec = get_phrase_vector(language_model, phrase1)
-    phrase2_vec = get_phrase_vector(language_model, phrase2)
+    phrase1_vec = get_phrase_vector(language, phrase1)
+    phrase2_vec = get_phrase_vector(language, phrase2)
     return phrase2_vec - phrase1_vec
 
 
@@ -67,9 +66,8 @@ def compare_answers(language: str, real_answer: str, user_answer: str) -> dict:
     elif first_score < FIRST_MODEL_THRESHOLD:
         equality_rate = first_score
     else:
-        language_model = _load_language_model(language)
-        v1 = get_phrase_vector(language_model, real_answer)
-        v2 = get_phrase_vector(language_model, user_answer)
+        v1 = get_phrase_vector(language, real_answer)
+        v2 = get_phrase_vector(language, user_answer)
         equality_rate = get_similarity(v1, v2)
 
     is_equal = 1 if equality_rate >= CORRECTNESS_RATE else 0

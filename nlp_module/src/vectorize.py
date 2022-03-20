@@ -22,16 +22,18 @@ def _load_language_model(model_name: str, extension: str = ".bin") -> object:
     return fasttext.load_model(model_path)
 
 
-def get_phrase_vector(language_model: object, phrase: str) -> np.ndarray:
+def get_phrase_vector(language: str, phrase: str) -> np.ndarray:
     """
     Get phrase vector using language model which provides each
     containing token embedding
 
-    :param language_model: defined language model for similarity processing
-    :param phrase_tokens: the list of tokens which is going to be norlmalized
+    :param language: Defined language model name for similarity processing.
+    :param phrase_tokens: The list of tokens which is going to be norlmalized.
 
-    :return: the numpy array of aggregated vector
+    :return: The numpy array of aggregated vector
     """
+    language_model = _load_language_model(language)
+
     # tokenization
     tokens = phrase.split() if len(phrase) > 0 else []
 

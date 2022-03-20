@@ -12,9 +12,8 @@ from dbase.database_connector import DatabaseConnector
 from dbase.actions import Action
 from dbase.transitions import TransitionSuccess, TransitionShift
 
-from utils.helpers import get_connected_chunks
+from utils.helpers import get_phrase_links
 
-# from utils.comparing import get_phrase_shift_vector
 
 POSTGRES_NAME = os.environ.get("POSTGRES_NAME")
 POSTGRES_USERNAME = os.environ.get("POSTGRES_USERNAME")
@@ -22,8 +21,7 @@ POSTGRES_PASSWORD = os.environ.get("POSTGRES_PASSWORD")
 POSTGRES_HOST = os.environ.get("POSTGRES_HOST")
 POSTGRES_PORT = os.environ.get("POSTGRES_PORT")
 
-_TRANSITIONS_CHUNK_SIZE = 15
-_TRANSITIONS_HOOKUPS = _TRANSITIONS_CHUNK_SIZE // 5
+_TRANSITIONS_NEIGHBOURS = 10
 
 
 class DbController:
@@ -56,31 +54,17 @@ class DbController:
             ]
         )
 
-        dataframe["id"] = dataframe.reset_index().index + 1
-
-        # create transition shift table
         transition_shift_table = pd.DataFrame()
-        # create transition success table
         transition_success_table = pd.DataFrame()
 
-        # upload transitions with restricted number of permutations
-        iterators = []
-        for idxs in get_connected_chunks(
-            dataframe.index,
-            chunk_size=_TRANSITIONS_CHUNK_SIZE,
-            hookups=_TRANSITIONS_HOOKUPS,
-        ):
-            iterators.append(itertools.permutations(idxs, 2))
+        # _TRANSITIONS_NEIGHBOURS
+        phrases = dataframe["english"].tolist()
+        pairs_to_link = get_phrase_links(phrases, n_neighbours=_TRANSITIONS_NEIGHBOURS)
 
-        transition_id = 0
-        for idx_from, idx_to in itertools.chain(*iterators):
-            if idx_from == idx_to:
-                continue
-
+        for idx_from, idx_to in pairs_to_link:
             phrases_from = dataframe.iloc[idx_from]
             phrases_to = dataframe.iloc[idx_to]
             for language in ["english", "russian", "ukrainian", "french"]:
-                transition_id += 1
                 phrase_from = phrases_from[language]
                 phrase_to = phrases_to[language]
 

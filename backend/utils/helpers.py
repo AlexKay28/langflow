@@ -1,6 +1,53 @@
+import os
 import itertools
 import numpy as np
 import pandas as pd
+from sklearn.neighbors import KDTree
+
+from utils.facade_api import FacadeAPI
+
+# set other services connection
+RL_SERVICE_URL = os.environ.get("RL_SERVICE_URL")
+NLP_SERVICE_URL = os.environ.get("NLP_SERVICE_URL")
+
+facade_api = FacadeAPI(
+    rl_url=RL_SERVICE_URL,
+    nlp_url=NLP_SERVICE_URL,
+)
+
+
+def get_phrase_links(
+    phrases: list, n_neighbours: int = 5, metric: str = "euclidean"
+) -> np.array:
+    """
+    Returns 1D array if pairs to record in interaction space table.
+
+    :param phrases: 1D array of phrases (str type).
+    :param hookups: The number of the neighbours linked per phrase.
+
+    :return: Array of indices of pairs.
+    """
+    phrases_vecs_matrix = np.array(
+        [
+            facade_api.nlp_get_phrase_vector("english", phrase)['vector']
+            for phrase in phrases
+        ]
+    )
+    # model init
+    kdt = KDTree(phrases_vecs_matrix, metric=metric)
+
+    pairs = []
+    for idx, phrase_vector in enumerate(phrases_vecs_matrix):
+        dists, indices = kdt.query(
+            np.atleast_2d(phrase_vector), k=n_neighbours, return_distance=True
+        )
+        neighbors = indices[dists != 0.0]
+        phrase_pairs = [
+            (idx, neighbor) for neighbor in neighbors
+        ]  # "from -> to" format
+        pairs.extend(phrase_pairs)
+
+    return pairs
 
 
 def get_connected_chunks(

@@ -12,7 +12,7 @@ INCORRECT_ANSWER_THRESHOLD = float(os.getenv('INCORRECT_ANSWER_THRESHOLD'))
 
 @api.route("/get_similarity", methods=["GET"])
 @swag_from("swaggers/get_similarity_api.yml")
-def get_similarity():
+def get_similarity_api():
     try:
         req = request.get_json()
         language = req["language"]
