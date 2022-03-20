@@ -18,11 +18,9 @@ def get_phrase_vector_api():
         language = req["language"]
         phrase = req["phrase"]
 
-        # compare_phrases
         vector = get_phrase_vector(language, phrase)
-        vector = str(vector)
 
-        return jsonify({"status": 200, "vector": vector})
+        return jsonify({"status": 200, "vector": str(vector)})
 
     except Exception as e:
         return jsonify(

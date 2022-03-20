@@ -284,6 +284,7 @@ class SessionController:
         slang = row.second_language
 
         phrases = db.session.query(Phrase).filter(Phrase.id == phrase_id).scalar()
+
         flang_phrase = getattr(phrases, flang)
         slang_phrase = getattr(phrases, slang)
 

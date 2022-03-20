@@ -1,4 +1,4 @@
-Utilize NLP approach to get the phrase veco.
+Utilize NLP approach to get the phrase vecs.
 ---
 description: Internal service
 consumes:
@@ -41,4 +41,4 @@ responses:
             description: Status code
           vector:
             type: string
-            description: The python like list
+            description: The python like list of float numbers

@@ -54,6 +54,9 @@ class DbController:
             ]
         )
 
+        # add index column for query adressing
+        dataframe["id"] = dataframe.reset_index().index + 1
+
         transition_shift_table = pd.DataFrame()
         transition_success_table = pd.DataFrame()
 
