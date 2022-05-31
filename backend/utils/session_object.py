@@ -10,9 +10,9 @@ import json
 import requests
 
 from dbase import db
-from dbase.users import UserAuthorized, UserAnon
 from dbase.actions import Action
-from dbase.phrases import Phrase
+from dbase.phrases import Phrase, PhraseVector
+from dbase.users import UserAuthorized, UserAnon, UserVector
 
 from utils.facade_api import FacadeAPI
 
@@ -99,6 +99,16 @@ class SessionController:
         db.session.add(user)
         db.session.commit()
 
+        user_vec = UserVector(
+            uuid=uuid_generated,
+            english_vec=np.random.rand(300),
+            french_vec=np.random.rand(300),
+            russian_vec=np.random.rand(300),
+            ukrainian_vec=np.random.rand(300),
+        )
+        db.session.add(user_vec)
+        db.session.commit()
+
         return 200, f"User <{username}> was created!"
 
     @staticmethod
@@ -125,6 +135,16 @@ class SessionController:
                 session_token=session_token_generated,
             )
             db.session.add(user)
+            db.session.commit()
+
+            user_vec = UserVector(
+                uuid=uuid_generated,
+                english_vec=np.random.rand(300),
+                french_vec=np.random.rand(300),
+                russian_vec=np.random.rand(300),
+                ukrainian_vec=np.random.rand(300),
+            )
+            db.session.add(user_vec)
             db.session.commit()
         else:
             # find existed user and set session token

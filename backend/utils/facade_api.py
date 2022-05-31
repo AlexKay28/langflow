@@ -76,6 +76,7 @@ class NLP:
                 },
             ).text
         )
+
         vector = [float(f) for f in response["vector"][1:-1].split()]
         if response["status"] == 200:
             return {"vector": vector}
@@ -89,10 +90,16 @@ class FacadeAPI:
         self.nlp_service = NLP(nlp_url)
 
     def rl_get_pair(self, level: int, second_language: str, uuid: str) -> Dict:
+        if not self.rl_service:
+            raise TypeError("RL service url wasn't provided")
         return self.rl_service.get_pair(level, second_language, uuid)
 
     def nlp_get_similarity(self, language: str, phrase1: str, phrase2: str) -> Dict:
+        if not self.nlp_service:
+            raise TypeError("NLP service url wasn't provided")
         return self.nlp_service.get_similarity(language, phrase1, phrase2)
 
     def nlp_get_phrase_vector(self, language: str, phrase: str) -> Dict:
+        if not self.nlp_service:
+            raise TypeError("NLP service url wasn't provided")
         return self.nlp_service.get_phrase_vector(language, phrase)

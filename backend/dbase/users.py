@@ -46,3 +46,25 @@ class UserAnon(db.Model):
 
     def __repr__(self):
         return f"({self.username})[{self.uuid}]"
+
+
+class UserVector(db.Model):
+    __tablename__ = "user_vecrors"
+
+    uuid = db.Column(UUID(as_uuid=True), primary_key=True)
+
+    def __init__(self, uuid, english_vec, french_vec, russian_vec, ukrainian_vec):
+        self.uuid = uuid
+        self.english_vec = english_vec
+        self.french_vec = french_vec
+        self.russian_vec = russian_vec
+        self.ukrainian_vec = ukrainian_vec
+
+    def __repr__(self):
+        repr = f"""[{self.uuid}]
+        english_vec: {self.english_vec};
+        french_vec: {self.french_vec};
+        russian_vec: {self.russian_vec};
+        ukrainian_vec: {self.ukrainian_vec};
+        """
+        return

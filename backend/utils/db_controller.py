@@ -10,9 +10,15 @@ from sqlalchemy import desc
 from dbase import db
 from dbase.database_connector import DatabaseConnector
 from dbase.actions import Action
-from dbase.transitions import TransitionSuccess, TransitionShift
 
 from utils.helpers import get_phrase_links
+from utils.facade_api import FacadeAPI
+
+# set other services connection
+NLP_SERVICE_URL = os.environ.get("NLP_SERVICE_URL")
+facade_api = FacadeAPI(
+    nlp_url=NLP_SERVICE_URL,
+)
 
 
 POSTGRES_NAME = os.environ.get("POSTGRES_NAME")
@@ -57,47 +63,14 @@ class DbController:
         # add index column for query adressing
         dataframe["id"] = dataframe.reset_index().index + 1
 
-        transition_shift_table = pd.DataFrame()
-        transition_success_table = pd.DataFrame()
-
-        # _TRANSITIONS_NEIGHBOURS
-        phrases = dataframe["english"].tolist()
-        pairs_to_link = get_phrase_links(phrases, n_neighbours=_TRANSITIONS_NEIGHBOURS)
-
-        for idx_from, idx_to in pairs_to_link:
-            phrases_from = dataframe.iloc[idx_from]
-            phrases_to = dataframe.iloc[idx_to]
-            for language in ["english", "russian", "ukrainian", "french"]:
-                phrase_from = phrases_from[language]
-                phrase_to = phrases_to[language]
-
-                # calculate shift vector = n ^ 2 vecs
-                shift_vector = np.array(
-                    [0]
-                )  # TODO: get_phrase_shift_vector(language, phrase_from, phrase_to)
-
-                transition_shift_table = transition_shift_table.append(
-                    {
-                        "language": language,
-                        "phrase_from": idx_from + 1,
-                        "phrase_to": idx_to + 1,
-                        "shift_vector": shift_vector.astype("float16").tolist(),
-                    },
-                    ignore_index=True,
-                )
-                transition_success_table = transition_success_table.append(
-                    [
-                        {
-                            "language": language,
-                            "user_group": 0,
-                            "n_updates": 1,
-                            "phrase_from": idx_from + 1,
-                            "phrase_to": idx_to + 1,
-                            "average_success": 1.0,
-                        },
-                    ],
-                    ignore_index=True,
-                )
+        # get vectors
+        phrase_vectors = dataframe[["id"]]
+        for language in ["english", "russian", "ukrainian", "french"]:
+            phrase_vectors[language] = dataframe[language].apply(
+                lambda phrase: facade_api.nlp_get_phrase_vector(language, phrase)[
+                    "vector"
+                ]
+            )
 
         # upload data to base
         dataframe.to_sql(
@@ -108,159 +81,13 @@ class DbController:
             index=False,
             method="multi",
         )
-        transition_shift_table.to_sql(
-            "transition_shift",
+        phrase_vectors.to_sql(
+            "phrases_vecs",
             self.dbconnector.engine,
             schema="public",
             if_exists="replace",
             index=False,
             method="multi",
         )
-        transition_success_table.to_sql(
-            "transition_success",
-            self.dbconnector.engine,
-            schema="public",
-            if_exists="replace",
-            index=False,
-            method="multi",
-        )
-
-        return 0
-
-    def update_transitions_global(self):
-        """
-        Update whole transition success table in db using actions
-        table by single apply.
-        """
-
-        # read actions table
-        actions_table = pd.read_sql("SELECT * FROM actions", self.dbconnector.engine)
-
-        # read transition success table
-        transition_success_table = pd.read_sql(
-            "SELECT * FROM transition_success", self.dbconnector.engine
-        )
-
-        # inecrementally update transition success table
-        for user_id in actions_table["uuid"].unique():
-            user_story_subtable = (
-                actions_table[actions_table["uuid"] == user_id]
-                .reset_index(drop=True)
-                .sort_values("action_date")
-            )
-            if user_story_subtable.shape[0] == 1:
-                continue
-            for idx in range(1, user_story_subtable.shape[0]):
-                previous_step = user_story_subtable.iloc[idx - 1]
-                current_step = user_story_subtable.iloc[idx]
-                previous_phrase_id = previous_step["phrase_id"]
-                current_phrase_id = current_step["phrase_id"]
-                transition_score = current_step["score"]
-                current_language = current_step["second_language"]
-
-                if current_phrase_id == previous_phrase_id:
-                    continue
-
-                # find needed transition index
-                needed_index = transition_success_table[
-                    (transition_success_table["phrase_from"] == previous_phrase_id)
-                    & (transition_success_table["phrase_to"] == current_phrase_id)
-                    & (transition_success_table["language"] == current_language)
-                ].index[0]
-
-                # read actual values
-                n_updates = transition_success_table.loc[needed_index, "n_updates"]
-                average = transition_success_table.loc[needed_index, "average_success"]
-
-                # update values inecrementally
-                n_updates += 1
-                average += (transition_score - average) / n_updates
-
-                # record new values
-                transition_success_table.loc[needed_index, "n_updates"] = n_updates
-                transition_success_table.loc[needed_index, "average_success"] = average
-
-        transition_success_table = transition_success_table.fillna(0.95)
-
-        # record new transition success matrix
-        transition_success_table.to_sql(
-            "transition_success",
-            self.dbconnector.engine,
-            schema="public",
-            if_exists="replace",
-            index=False,
-            method="multi",
-        )
-
-        return 0
-
-    def update_transitions(self, language, uuid):
-        """
-        Update transitions for specified user
-        """
-
-        # select last two user actions
-        actions = [
-            {"phrase_id": r.phrase_id, "score": r.score}
-            for r in db.session.query(
-                Action.phrase_id,
-                Action.score,
-            )
-            .filter(Action.uuid == uuid)
-            .order_by(desc(Action.action_date))
-            .limit(2)
-        ]
-
-        if len(actions) < 2:
-            return
-
-        # get previous & current question ids, score
-        previous_phrase_id = actions[1]["phrase_id"]
-        current_phrase_id = actions[0]["phrase_id"]
-        transition_score = actions[0]["score"]
-
-        # get existed average success
-        n_updates = (
-            db.session.query(TransitionSuccess.n_updates)
-            .filter(
-                and_(
-                    TransitionSuccess.language == language,
-                    TransitionSuccess.phrase_from == previous_phrase_id,
-                    TransitionSuccess.phrase_to == current_phrase_id,
-                )
-            )
-            .scalar()
-        )
-
-        if not n_updates:
-            # pure phrase pair. no connection
-            # nothing top update
-            return
-
-        average = (
-            db.session.query(TransitionSuccess.average_success)
-            .filter(
-                and_(
-                    TransitionSuccess.language == language,
-                    TransitionSuccess.phrase_from == previous_phrase_id,
-                    TransitionSuccess.phrase_to == current_phrase_id,
-                )
-            )
-            .scalar()
-        )
-
-        # inecrement
-        n_updates += 1
-        new_average_success = average + (transition_score - average) / n_updates
-
-        # update transition pair by score inecrementally
-        db.session.query(TransitionSuccess).filter(
-            and_(
-                TransitionSuccess.language == language,
-                TransitionSuccess.phrase_from == previous_phrase_id,
-                TransitionSuccess.phrase_to == current_phrase_id,
-            )
-        ).update({"average_success": new_average_success})
-        db.session.commit()
 
         return 0

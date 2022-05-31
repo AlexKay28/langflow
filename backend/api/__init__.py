@@ -28,4 +28,3 @@ from .question_api import question_api
 from .answer_api import answer_api
 from .results_api import results_api
 from .upload_phrases import upload_phrases
-from .update_transitions import update_transitions

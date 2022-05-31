@@ -1,5 +1,24 @@
 version: '3.2'
 services:
+
+    pgadmin:
+      image: dpage/pgadmin4
+      container_name: pgadmin
+      environment:
+        PGADMIN_DEFAULT_EMAIL: langflow@russia.win
+        PGADMIN_DEFAULT_PASSWORD: 123456
+      volumes:
+         - ./data/pgadmin:/var/lib/pgadmin/data
+      ports:
+        - 5050:80
+      depends_on:
+        - postgres
+      networks:
+        lfnet:
+          ipv4_address: 10.192.1.11
+      logging:
+        driver: none
+
     backend:
         build:
           context: ./backend
@@ -25,6 +44,7 @@ services:
         container_name: langflow_application_rl
         depends_on:
           - backend
+          - postgres
         volumes:
           - ./rl_module:/rl_module
         ports:
@@ -33,6 +53,7 @@ services:
           lfnet:
             ipv4_address: 10.192.1.22
         command: python -u app.py
+        restart: always
 
     nlp_module:
         build:
@@ -40,6 +61,9 @@ services:
           dockerfile: Dockerfile
         image: langflow_nlp:v0.1
         container_name: langflow_application_nlp
+        depends_on:
+          - backend
+          - postgres
         volumes:
           - ./nlp_module:/nlp_module
         ports:
@@ -48,6 +72,7 @@ services:
           lfnet:
             ipv4_address: 10.192.1.23
         command: python -u app.py
+        restart: always
 
     frontend:
         build:
@@ -76,23 +101,6 @@ services:
         lfnet:
           ipv4_address: 10.192.1.10
 
-    pgadmin:
-      image: dpage/pgadmin4
-      container_name: pgadmin
-      environment:
-        PGADMIN_DEFAULT_EMAIL: langflow@russia.win
-        PGADMIN_DEFAULT_PASSWORD: 123456
-      volumes:
-         - ./data/pgadmin:/var/lib/pgadmin/data
-      ports:
-        - 5050:80
-      depends_on:
-        - postgres
-      networks:
-        lfnet:
-          ipv4_address: 10.192.1.11
-      logging:
-        driver: none
 
 networks:
   lfnet:
