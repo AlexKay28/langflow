@@ -7,7 +7,7 @@ from functools import lru_cache
 PATH_TO_MODELS = "language_models/"
 
 
-# @lru_cache(maxsize=2)
+@lru_cache(maxsize=2)
 def _load_language_model(model_name: str, extension: str = ".bin") -> object:
     """
     Load fasttext model
