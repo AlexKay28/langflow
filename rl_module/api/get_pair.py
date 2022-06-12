@@ -17,13 +17,14 @@ def get_pair_api():
         level = req["level"]
 
         # load tables from base with current user state
-        current_state = env.get_user_state(uuid)
+        current_state = env.get_user_state(uuid, second_language)
 
         # choose question
         phrase_id = agent(current_state, policy_type="e_greedy")
 
         # phrase_id, reward, done, info = env.step(action)
 
+        phrase_id = int(phrase_id)
         return jsonify(
             {
                 "status": 200,

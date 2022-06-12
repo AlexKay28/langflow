@@ -49,22 +49,26 @@ class UserAnon(db.Model):
 
 
 class UserVector(db.Model):
-    __tablename__ = "user_vecrors"
+    __tablename__ = "user_vectors"
 
     uuid = db.Column(UUID(as_uuid=True), primary_key=True)
+    english = db.Column(db.ARRAY(db.Float), nullable=False)
+    french = db.Column(db.ARRAY(db.Float), nullable=False)
+    russian = db.Column(db.ARRAY(db.Float), nullable=False)
+    ukrainian = db.Column(db.ARRAY(db.Float), nullable=False)
 
-    def __init__(self, uuid, english_vec, french_vec, russian_vec, ukrainian_vec):
+    def __init__(self, uuid, english, french, russian, ukrainian):
         self.uuid = uuid
-        self.english_vec = english_vec
-        self.french_vec = french_vec
-        self.russian_vec = russian_vec
-        self.ukrainian_vec = ukrainian_vec
+        self.english = english
+        self.french = french
+        self.russian = russian
+        self.ukrainian = ukrainian
 
     def __repr__(self):
         repr = f"""[{self.uuid}]
-        english_vec: {self.english_vec};
-        french_vec: {self.french_vec};
-        russian_vec: {self.russian_vec};
-        ukrainian_vec: {self.ukrainian_vec};
+        english: {self.english};
+        french: {self.french};
+        russian: {self.russian};
+        ukrainian: {self.ukrainian};
         """
         return

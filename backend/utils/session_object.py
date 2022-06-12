@@ -101,10 +101,10 @@ class SessionController:
 
         user_vec = UserVector(
             uuid=uuid_generated,
-            english_vec=np.random.rand(300),
-            french_vec=np.random.rand(300),
-            russian_vec=np.random.rand(300),
-            ukrainian_vec=np.random.rand(300),
+            english=np.random.rand(300),
+            french=np.random.rand(300),
+            russian=np.random.rand(300),
+            ukrainian=np.random.rand(300),
         )
         db.session.add(user_vec)
         db.session.commit()
@@ -139,10 +139,10 @@ class SessionController:
 
             user_vec = UserVector(
                 uuid=uuid_generated,
-                english_vec=np.random.rand(300),
-                french_vec=np.random.rand(300),
-                russian_vec=np.random.rand(300),
-                ukrainian_vec=np.random.rand(300),
+                english=np.random.rand(8),
+                french=np.random.rand(8),
+                russian=np.random.rand(8),
+                ukrainian=np.random.rand(8),
             )
             db.session.add(user_vec)
             db.session.commit()
@@ -224,12 +224,9 @@ class SessionController:
             phrases_id = db.session.query(Phrase.id).distinct()
 
         # RL WORKS HERE
-        # phrase_id = int(np.random.choice([r.id for r in phrases_id]))
         response = facade_api.rl_get_pair(level, second_language, uuid)
+        raise ValueError(response)
         phrase_id = int(response["phrase_id"])
-
-        # if phrase_id not in [r.id for r in phrases_id]:
-        #     raise ValueError(f"Wrong phrase id: {phrases_id}")
 
         flang = str(
             db.session.query(getattr(Phrase, first_language))
