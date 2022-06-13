@@ -9,7 +9,7 @@ from sqlalchemy import desc
 
 from dbase import db
 from dbase.database_connector import DatabaseConnector
-from dbase.actions import Action
+from dbase.phrases import Phrase, PhraseVector
 
 from utils.helpers import get_phrase_links
 from utils.facade_api import FacadeAPI
@@ -44,36 +44,27 @@ class DbController:
             POSTGRES_PORT,
         )
 
-    def upload_phrases_to_db(self, dataframe: pd.DataFrame):
+    def upload_phrases_to_db(self, phrases: pd.DataFrame):
         """
         Upload provided data to database replacing the previous one.
         Methods uploads phrases to database, transition shift vector and
         transition success matrices.
 
-        :param dataframe: pandas dataframe to upload to base
+        :param phrases: pandas dataframe to upload to base
         """
         # check needed columns
         assert all(
             [
-                col in dataframe.columns
+                col in phrases.columns
                 for col in ["level", "english", "russian", "ukrainian", "french"]
             ]
         )
 
         # add index column for query adressing
-        dataframe["id"] = dataframe.reset_index().index + 1
-
-        # get vectors
-        phrase_vectors = dataframe[["id"]]
-        for language in ["english", "russian", "ukrainian", "french"]:
-            phrase_vectors[language] = dataframe[language].apply(
-                lambda phrase: facade_api.nlp_get_phrase_vector(language, phrase)[
-                    "vector"
-                ]
-            )
+        phrases["id"] = phrases.reset_index()["index"] + 1
 
         # upload data to base
-        dataframe.to_sql(
+        phrases.to_sql(
             "phrases",
             self.dbconnector.engine,
             schema="public",
@@ -81,13 +72,27 @@ class DbController:
             index=False,
             method="multi",
         )
-        phrase_vectors.to_sql(
-            "phrases_vecs",
-            self.dbconnector.engine,
-            schema="public",
-            if_exists="replace",
-            index=False,
-            method="multi",
-        )
 
-        return 0
+        # get vectors
+        phrases_vec = phrases[["id"]]
+        for language in ["english", "russian", "ukrainian", "french"]:
+            phrases_vec[language] = phrases[language].apply(
+                lambda phrase: facade_api.nlp_get_phrase_vector(language, phrase)[
+                    "vector"
+                ]
+            )
+
+        # delete all the records in the existed table
+        db.session.query(PhraseVector).delete()
+        db.session.commit()
+
+        for index, row in phrases_vec.iterrows():
+            phrase_vec = PhraseVector(
+                id=row["id"],
+                english=row["english"],
+                french=row["french"],
+                russian=row["russian"],
+                ukrainian=row["ukrainian"],
+            )
+            db.session.add(phrase_vec)
+            db.session.commit()

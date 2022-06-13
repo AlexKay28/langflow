@@ -60,7 +60,7 @@ class QuestionSpaceEnv:
         user_vec_query = f"SELECT * FROM user_vectors WHERE uuid = '{uuid}'"
         user_vec = pd.read_sql(user_vec_query, self.db.engine)
 
-        vector = user_vec[second_language].to_numpy()[0][:8]
+        vector = user_vec[second_language].to_numpy()[0]
 
         dists, idxs = self.knn_model[second_language].kneighbors(
             [vector], n_neighbors, return_distance=True

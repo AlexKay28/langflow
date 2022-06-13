@@ -101,10 +101,10 @@ class SessionController:
 
         user_vec = UserVector(
             uuid=uuid_generated,
-            english=np.random.rand(300),
-            french=np.random.rand(300),
-            russian=np.random.rand(300),
-            ukrainian=np.random.rand(300),
+            english=np.random.rand(8),
+            french=np.random.rand(8),
+            russian=np.random.rand(8),
+            ukrainian=np.random.rand(8),
         )
         db.session.add(user_vec)
         db.session.commit()
@@ -225,7 +225,7 @@ class SessionController:
 
         # RL WORKS HERE
         response = facade_api.rl_get_pair(level, second_language, uuid)
-        raise ValueError(response)
+
         phrase_id = int(response["phrase_id"])
 
         flang = str(
@@ -305,7 +305,7 @@ class SessionController:
         flang_phrase = getattr(phrases, flang)
         slang_phrase = getattr(phrases, slang)
 
-        return flang, flang_phrase, slang, slang_phrase
+        return phrase_id, flang, flang_phrase, slang, slang_phrase
 
     @staticmethod
     def compare_answers(language, phrase1, phrase2):
@@ -326,6 +326,29 @@ class SessionController:
         db.session.query(Action).filter(
             and_(Action.quid == quid, Action.uuid == uuid)
         ).update({"user_answer": user_answer, "score": round(score, 3)})
+        db.session.commit()
+
+    def update_user_vec(
+        self,
+        phrase_id: str,
+        uuid: str,
+        slang: str,
+        score: float,
+        gamma: float = 0.5,
+        score_threshold: float = 0.75,
+    ):
+        """
+        Update user's vector
+        """
+        user_vec = db.session.query(UserVector).filter(UserVector.uuid == uuid)
+        phrase_vec = db.session.query(PhraseVector).filter(PhraseVector.id == phrase_id)
+
+        user_vec_ar = np.array(getattr(user_vec.scalar(), slang))
+        phrase_vec_ar = np.array(getattr(phrase_vec.scalar(), slang))
+
+        user_vec_ar += gamma * (score - score_threshold) * (user_vec_ar - phrase_vec_ar)
+
+        user_vec.update({slang: user_vec_ar})
         db.session.commit()
 
     def get_user_analysis(self, uuid: str) -> dict:

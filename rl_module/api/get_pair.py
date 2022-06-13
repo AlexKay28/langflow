@@ -24,11 +24,10 @@ def get_pair_api():
 
         # phrase_id, reward, done, info = env.step(action)
 
-        phrase_id = int(phrase_id)
         return jsonify(
             {
                 "status": 200,
-                "phrase_id": phrase_id,
+                "phrase_id": int(phrase_id),
             }
         )
     except Exception as e:

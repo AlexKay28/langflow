@@ -23,7 +23,9 @@ def answer_api():
         quid = session.get_question_quid(question_token)
 
         # get info from db about users question
-        flang, flang_phrase, slang, slang_phrase = session.get_user_phrases(uuid, quid)
+        phrase_id, flang, flang_phrase, slang, slang_phrase = session.get_user_phrases(
+            uuid, quid
+        )
 
         # apply models to compare answer and get inference
         comparing_result = session.compare_answers(slang, slang_phrase, user_answer)
@@ -35,8 +37,8 @@ def answer_api():
         if score:
             # records users success/fail in his metadata
             session.record_users_result(uuid, quid, user_answer, score)
-            # update transition matrics on the fly
-            db_controller.update_transitions(slang, uuid)
+            # update user's vector
+            session.update_user_vec(phrase_id, uuid, slang, score)
 
         return jsonify(
             {

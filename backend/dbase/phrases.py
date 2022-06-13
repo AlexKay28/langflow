@@ -32,7 +32,7 @@ class Phrase(db.Model):
 
 
 class PhraseVector(db.Model):
-    __tablename__ = "phrases_vecs"
+    __tablename__ = "phrases_vec"
 
     id = db.Column(db.Integer, primary_key=True, unique=True)
     english = db.Column(db.ARRAY(db.Float), nullable=False)
@@ -43,17 +43,16 @@ class PhraseVector(db.Model):
     def __init__(
         self,
         id,
-        level,
-        english_vec,
-        french_vec,
-        russian_vec,
-        ukrainian_vec,
+        english,
+        french,
+        russian,
+        ukrainian,
     ):
         self.id = id
-        self.english = english_vec
-        self.french = french_vec
-        self.russian = russian_vec
-        self.ukrainian = ukrainian_vec
+        self.english = english
+        self.french = french
+        self.russian = russian
+        self.ukrainian = ukrainian
 
     def __repr__(self):
         return f"({self.id})[vec shape: {self.english.shape}]"
