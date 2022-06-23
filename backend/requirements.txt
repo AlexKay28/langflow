@@ -37,6 +37,7 @@ Werkzeug==2.0.1
 psycopg2==2.7.7
 flasgger==0.9.5
 requests==2.24.0
+retry==0.9.2
 
 pytest==6.2.5
 pytest-flask==1.2.0

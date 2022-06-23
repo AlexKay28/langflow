@@ -10,9 +10,9 @@ import json
 import requests
 
 from dbase import db
-from dbase.users import UserAuthorized, UserAnon
 from dbase.actions import Action
-from dbase.phrases import Phrase
+from dbase.phrases import Phrase, PhraseVector
+from dbase.users import UserAuthorized, UserAnon, UserVector
 
 from utils.facade_api import FacadeAPI
 
@@ -99,6 +99,16 @@ class SessionController:
         db.session.add(user)
         db.session.commit()
 
+        user_vec = UserVector(
+            uuid=uuid_generated,
+            english=np.random.rand(8),
+            french=np.random.rand(8),
+            russian=np.random.rand(8),
+            ukrainian=np.random.rand(8),
+        )
+        db.session.add(user_vec)
+        db.session.commit()
+
         return 200, f"User <{username}> was created!"
 
     @staticmethod
@@ -125,6 +135,16 @@ class SessionController:
                 session_token=session_token_generated,
             )
             db.session.add(user)
+            db.session.commit()
+
+            user_vec = UserVector(
+                uuid=uuid_generated,
+                english=np.random.rand(8),
+                french=np.random.rand(8),
+                russian=np.random.rand(8),
+                ukrainian=np.random.rand(8),
+            )
+            db.session.add(user_vec)
             db.session.commit()
         else:
             # find existed user and set session token
@@ -204,12 +224,9 @@ class SessionController:
             phrases_id = db.session.query(Phrase.id).distinct()
 
         # RL WORKS HERE
-        # phrase_id = int(np.random.choice([r.id for r in phrases_id]))
         response = facade_api.rl_get_pair(level, second_language, uuid)
-        phrase_id = int(response["phrase_id"])
 
-        # if phrase_id not in [r.id for r in phrases_id]:
-        #     raise ValueError(f"Wrong phrase id: {phrases_id}")
+        phrase_id = int(response["phrase_id"])
 
         flang = str(
             db.session.query(getattr(Phrase, first_language))
@@ -288,7 +305,7 @@ class SessionController:
         flang_phrase = getattr(phrases, flang)
         slang_phrase = getattr(phrases, slang)
 
-        return flang, flang_phrase, slang, slang_phrase
+        return phrase_id, flang, flang_phrase, slang, slang_phrase
 
     @staticmethod
     def compare_answers(language, phrase1, phrase2):
@@ -309,6 +326,29 @@ class SessionController:
         db.session.query(Action).filter(
             and_(Action.quid == quid, Action.uuid == uuid)
         ).update({"user_answer": user_answer, "score": round(score, 3)})
+        db.session.commit()
+
+    def update_user_vec(
+        self,
+        phrase_id: str,
+        uuid: str,
+        slang: str,
+        score: float,
+        gamma: float = 0.5,
+        score_threshold: float = 0.75,
+    ):
+        """
+        Update user's vector
+        """
+        user_vec = db.session.query(UserVector).filter(UserVector.uuid == uuid)
+        phrase_vec = db.session.query(PhraseVector).filter(PhraseVector.id == phrase_id)
+
+        user_vec_ar = np.array(getattr(user_vec.scalar(), slang))
+        phrase_vec_ar = np.array(getattr(phrase_vec.scalar(), slang))
+
+        user_vec_ar += gamma * (score - score_threshold) * (user_vec_ar - phrase_vec_ar)
+
+        user_vec.update({slang: user_vec_ar})
         db.session.commit()
 
     def get_user_analysis(self, uuid: str) -> dict:

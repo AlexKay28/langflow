@@ -1,7 +1,10 @@
 import os
+import ast
 import numpy as np
 import pandas as pd
 from typing import Tuple
+
+from sklearn.neighbors import NearestNeighbors
 
 from src.database_connector import DatabaseConnector
 
@@ -16,25 +19,8 @@ class QuestionSpaceEnv:
     """
     Description:
         Question space contains phrases ids and their expected probs.
-    Observation:
-        Type:
-        Num     Observation                   Representation
-        0       The shift vector till
-                the first closest question    (phrase_id, prob)
-        1       The shift vector till
-                the second closest question   (phrase_id, prob)
-        2       The shift vector till
-                the third closest question    (phrase_id, prob)
-    Actions:
-        Type: Discrete(2)
-        Num   Action
-        0     Choose the first closest question
-        1     Choose the second closest question
-        2     Choose the third closest question
     Reward:
         Reward is between [0, 1] and estimated by semantic closeness
-    Starting State:
-        Randomly
     Episode Termination:
         Defined number of iteration and early stopped
     """
@@ -48,46 +34,48 @@ class QuestionSpaceEnv:
             POSTGRES_PORT,
         )
 
-        self.transition_success_table = pd.read_sql(
-            f"SELECT * FROM transition_success", self.db.engine
-        )
-        self.n_questions_to_consider = 5
+        phrase_vec_query = f"SELECT * FROM phrases_vecs"
+        self.phrase_vec = pd.read_sql(phrase_vec_query, self.db.engine)
 
-    def get_user_state(self, uuid):
+        self.knn_model = {}
+        for lang in ["russian", "english", "french", "ukrainian"]:
+            space = np.array(
+                [list(ast.literal_eval(v)) for v in self.phrase_vec[lang].values]
+            )
+            model = NearestNeighbors(n_neighbors=15, algorithm='auto')
+            model.fit(space)
+            self.knn_model[lang] = model
+
+    def get_user_state(
+        self, uuid: str, second_language: str, n_neighbors: int = 5
+    ) -> dict:
         """
         Find previous user state and select all possible states with their success probs.
 
         :param uuid: user id
-
-        :return: list of probs for each next phrase and id of phrase.
-                 [(phrase_id1, prob1), (phrase_id2, prob2)]
+        :param second_language: language to calculate
+        :param n_neighbors: number of neighbors to select
+        :return: user state dict
         """
-        n_previous = 15
+        user_vec_query = f"SELECT * FROM user_vectors WHERE uuid = '{uuid}'"
+        user_vec = pd.read_sql(user_vec_query, self.db.engine)
 
-        query = (
-            f"SELECT * FROM actions WHERE uuid = '{uuid}' "
-            f"ORDER BY action_date DESC LIMIT {n_previous}"
+        vector = user_vec[second_language].to_numpy()[0]
+
+        dists, idxs = self.knn_model[second_language].kneighbors(
+            [vector], n_neighbors, return_distance=True
         )
-        user_actions_table = pd.read_sql(query, self.db.engine)
+        dists, idxs = dists[0], idxs[0]
 
-        relevant_table = self.transition_success_table
+        phrase_idx = self.phrase_vec["id"].iloc[idxs]
+        phrase_vec = self.phrase_vec[second_language].iloc[idxs]
 
-        # n_user_actions = user_actions_table.shape[0]
-        # if n_user_actions > 0:
-        #     last_phrase_id = user_actions_table["phrase_id"].iloc[0]
-        #     # TODO: build connections between chunks
-        #     relevant_table = self.transition_success_table[
-        #         self.transition_success_table.phrase_from == last_phrase_id
-        #     ]
-
-        possible_states_phrases = relevant_table["phrase_to"].to_list()
-        possible_states_probs = relevant_table["average_success"].to_list()
-
-        state = [
-            (phrase, 1 - prob)
-            for phrase, prob in zip(possible_states_phrases, possible_states_probs)
-        ]
-
+        state = {
+            "user": user_vec,
+            "idx": phrase_idx,
+            "phrases": phrase_vec,
+            "distances": dists,
+        }
         return state
 
     def step(self, action: int) -> Tuple[list, float, bool, dict]:

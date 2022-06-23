@@ -8,6 +8,10 @@ from dotenv import load_dotenv
 
 load_dotenv(".env")
 
+import time
+
+time.sleep(3)
+
 from api import api
 
 

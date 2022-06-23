@@ -1,3 +1,4 @@
+import time
 import psycopg2
 import sqlalchemy
 import pandas as pd
@@ -34,6 +35,25 @@ class DatabaseConnector:
             host=self.host,
             port=self.port,
         )
+        self.engine = sqlalchemy.create_engine(
+            f"postgresql+psycopg2://{username}:{password}@{host}:{port}/{dbname}"
+        )
+        self.cur = self.conn.cursor()
+
+        while 1:
+            try:
+                self.conn = psycopg2.connect(
+                    dbname=self.dbname,
+                    user=self.username,
+                    password=self.password,
+                    host=self.host,
+                    port=self.port,
+                )
+                break
+            except psycopg2.OperationalError:
+                print(f"Retry to connect: {self.dbname}")
+                time.sleep(5)
+
         self.engine = sqlalchemy.create_engine(
             f"postgresql+psycopg2://{username}:{password}@{host}:{port}/{dbname}"
         )

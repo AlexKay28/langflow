@@ -11,7 +11,15 @@ class Phrase(db.Model):
     russian = db.Column(db.String(256), nullable=False)
     ukrainian = db.Column(db.String(256), nullable=False)
 
-    def __init__(self, id, level, english, french, russian, ukrainian):
+    def __init__(
+        self,
+        id,
+        level,
+        english,
+        french,
+        russian,
+        ukrainian,
+    ):
         self.id = id
         self.level = level
         self.english = english
@@ -20,4 +28,31 @@ class Phrase(db.Model):
         self.ukrainian = ukrainian
 
     def __repr__(self):
-        return f"({english}]"
+        return f"entity: ( id, level, [language, vector] * n_langs )"
+
+
+class PhraseVector(db.Model):
+    __tablename__ = "phrases_vec"
+
+    id = db.Column(db.Integer, primary_key=True, unique=True)
+    english = db.Column(db.ARRAY(db.Float), nullable=False)
+    french = db.Column(db.ARRAY(db.Float), nullable=False)
+    russian = db.Column(db.ARRAY(db.Float), nullable=False)
+    ukrainian = db.Column(db.ARRAY(db.Float), nullable=False)
+
+    def __init__(
+        self,
+        id,
+        english,
+        french,
+        russian,
+        ukrainian,
+    ):
+        self.id = id
+        self.english = english
+        self.french = french
+        self.russian = russian
+        self.ukrainian = ukrainian
+
+    def __repr__(self):
+        return f"({self.id})[vec shape: {self.english.shape}]"

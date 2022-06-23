@@ -8,8 +8,25 @@ class Agent:
         pass
 
     def __call__(self, current_state, policy_type="e_greedy"):
-        phrase_ids_in_base = [i[0] for i in current_state]
-        phrase_probs = [i[1] for i in current_state]
+        """
+        state = {
+            "user": user_vec,
+            "idx": phrase_idx,
+            "phrases": phrase_vec,
+            "distances": dists
+        }
+        """
+        user = current_state["user"]
+        idxs = current_state["idx"]
+        phrases = current_state["phrases"]
+        distances = current_state["distances"]
+
+        # flatten array
+        idxs = idxs.squeeze()
+        distances = distances.squeeze()
+
+        # take softmax
+        phrase_probs = 1 - np.exp(distances) / sum(np.exp(distances))
 
         if policy_type == "greedy":
             choosed_phrase = self.greedy_policy(phrase_probs)
@@ -18,7 +35,7 @@ class Agent:
         else:
             raise KeyError(f"Unknown policy type <{policy_type}>")
 
-        return phrase_ids_in_base[choosed_phrase]
+        return idxs[choosed_phrase]
 
     def greedy_policy(self, action_space) -> int:
         return np.argmax(action_space)
